@@ -1,0 +1,22 @@
+{
+  "title": "蛙吹Keroro的不完整歌单",
+  "name": "蛙吹Keroro",
+  "subtitle": "房间号:22344968",
+  "announcement": "<i class=\"fas fa-music\"></i> <strong>蛙吹Keroro 的不完整歌单  持续更新中 </strong> <i class=\"fas fa-sync-alt\"></i> \n\n<i class=\"fas fa-code\"></i> 网页及工具由 <strong>LuckyKe_</strong> 借助各种 vibe coding 工具编写，非科班出身，如有纰漏还请见谅。网页的全部资源来自网络公开内容。关于网页或歌单内容如有问题欢迎随时在Q群/B站联系LuckyKe_，谢谢！\n\n<i class=\"fab fa-github\"></i> [Github](xxxx)",
+  "links": [
+    {
+      "text": "个人空间",
+      "url": "https://space.bilibili.com/613345189"
+    },
+    {
+      "text": "直播间",
+      "url": "https://live.bilibili.com/22344968"
+    },
+    {
+      "text": "直播周表",
+      "url": "https://www.bilibili.com/opus/1180314900546715650"
+    }
+  ],
+  "background": "background.jpg",
+  "avatar": "avatar.JPG"
+}

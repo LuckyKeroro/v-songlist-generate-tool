@@ -1,0 +1,12 @@
+node_modules/
+dist/
+Resources/
+public/background.*
+public/avatar.*
+!public/.gitkeep
+.DS_Store
+*.log
+
+# Claude Code 相关
+.claude/
+CLAUDE.md

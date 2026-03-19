@@ -1,0 +1,625 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f0e6 0%, #e8e0d0 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: white;
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  color: #333;
+  border-bottom: 2px solid #c4a35a;
+  padding-bottom: 8px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 配置区 */
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-item label {
+  font-weight: 600;
+  color: #555;
+}
+
+.config-item input,
+.config-item textarea {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.config-item input:focus,
+.config-item textarea:focus {
+  outline: none;
+  border-color: #8b7355;
+}
+
+.links-config {
+  margin-bottom: 16px;
+}
+
+.links-config h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.link-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 12px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.link-row input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.link-row input:focus {
+  outline: none;
+  border-color: #8b7355;
+}
+
+/* 按钮 */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #8b7355;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #756248;
+}
+
+.btn-secondary {
+  background: #d4c4a8;
+  color: #4a4a4a;
+}
+
+.btn-secondary:hover {
+  background: #c4b498;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* 上传区 */
+.upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.upload-item label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.drop-zone {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drop-zone:hover {
+  border-color: #8b7355;
+  background: #faf7f0;
+}
+
+.drop-zone.dragover {
+  border-color: #8b7355;
+  background: #faf7f0;
+}
+
+.drop-zone span {
+  color: #888;
+}
+
+.drop-zone .hint {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 8px;
+}
+
+.drop-zone .preview {
+  max-width: 100%;
+  max-height: 150px;
+  border-radius: 4px;
+}
+
+/* 歌曲列表 */
+.song-list {
+  max-height: 480px; /* 默认10条 */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: max-height 0.2s ease;
+}
+
+/* 高度选项：每条约48px */
+.song-list.height-5 { max-height: 240px; }
+.song-list.height-10 { max-height: 480px; }
+.song-list.height-15 { max-height: 720px; }
+.song-list.height-20 { max-height: 960px; }
+.song-list.height-25 { max-height: 1200px; }
+.song-list.height-30 { max-height: 1440px; }
+
+.song-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  gap: 12px;
+}
+
+.song-item:last-child {
+  border-bottom: none;
+}
+
+.song-info {
+  flex: 1;
+}
+
+.song-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.song-artist {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.song-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-confirmed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-manual {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-exists {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.group-header {
+  color: #8b7355;
+}
+
+.song-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 可点击的歌曲条目 */
+.song-item.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.song-item.clickable:hover {
+  background-color: #f5f0e6;
+}
+
+/* 高亮效果 */
+.saved-item.highlight {
+  background-color: #fef3c7;
+  animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+  0% { background-color: #fef3c7; }
+  70% { background-color: #fef3c7; }
+  100% { background-color: transparent; }
+}
+
+/* 已保存歌曲 */
+.saved-list {
+  max-height: 480px; /* 默认10条 */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: max-height 0.2s ease;
+}
+
+/* 高度选项：每条约44px */
+.saved-list.height-5 { max-height: 220px; }
+.saved-list.height-10 { max-height: 440px; }
+.saved-list.height-15 { max-height: 660px; }
+.saved-list.height-20 { max-height: 880px; }
+.saved-list.height-25 { max-height: 1100px; }
+.saved-list.height-30 { max-height: 1320px; }
+  max-height: 480px; /* 默认10条 */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: max-height 0.2s ease;
+}
+
+/* 高度选项：每条约44px */
+.saved-list.height-5 { max-height: 220px; }
+.saved-list.height-10 { max-height: 440px; }
+.saved-list.height-15 { max-height: 660px; }
+.saved-list.height-20 { max-height: 880px; }
+.saved-list.height-25 { max-height: 1100px; }
+.saved-list.height-30 { max-height: 1320px; }
+
+.saved-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+  gap: 12px;
+}
+
+.saved-item:last-child {
+  border-bottom: none;
+}
+
+.saved-info {
+  flex: 1;
+}
+
+.saved-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.saved-title {
+  font-weight: 500;
+}
+
+.saved-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 空状态 */
+.empty-hint {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+}
+
+/* 操作区 */
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* 生成区 */
+.generate-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#generateStatus {
+  color: #666;
+}
+
+/* 弹窗 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 搜索结果 */
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.search-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-column-header {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.search-column-header.qq {
+  background: #31c27c;
+  color: white;
+}
+
+.search-column-header.netease {
+  background: #e60026;
+  color: white;
+}
+
+.no-results {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-size: 13px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-result-item:hover {
+  border-color: #8b7355;
+  background: #faf7f0;
+}
+
+.search-result-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.search-result-info h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.search-result-info p {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 表单 */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #8b7355;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2000;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .config-grid,
+  .upload-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .link-row {
+    grid-template-columns: 1fr;
+  }
+}

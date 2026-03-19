@@ -1,0 +1,99 @@
+.song-list-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.alphabet-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 12px 6px;
+  background: #f8f9fa;
+  border-left: 1px solid #eee;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.alphabet-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #2d6a4f;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alphabet-btn:hover {
+  background: #2d6a4f;
+  color: white;
+}
+
+.alphabet-btn:active {
+  background: #1e4d34;
+  color: white;
+}
+
+.song-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.song-list-empty {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #888;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.song-group {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.song-group:last-child {
+  border-bottom: none;
+}
+
+.group-header {
+  padding: 10px 16px;
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d6a4f;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.group-songs {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 滚动条样式 */
+.song-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.song-list::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.song-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.song-list::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vup 歌单管理工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 Vup 歌单管理工具</h1>
+    </header>
+
+    <!-- 配置区 -->
+    <section class="config-section">
+      <h2>📝 基本配置</h2>
+      <div class="config-grid">
+        <div class="config-item">
+          <label>网页标题</label>
+          <input type="text" id="pageTitle" placeholder="输入网页标题">
+        </div>
+        <div class="config-item">
+          <label>主播名字</label>
+          <input type="text" id="streamerName" placeholder="输入主播名字">
+        </div>
+        <div class="config-item">
+          <label>副标题/房间号</label>
+          <input type="text" id="subtitle" placeholder="显示在名字下方，如房间号">
+        </div>
+        <div class="config-item">
+          <label>公告内容</label>
+          <textarea id="announcement" rows="3" placeholder="输入公告内容"></textarea>
+        </div>
+      </div>
+
+      <div class="links-config">
+        <h3>链接配置</h3>
+        <div id="linksContainer"></div>
+        <button type="button" class="btn btn-secondary btn-small" onclick="addLink()">+ 添加链接</button>
+      </div>
+
+      <button id="saveConfig" class="btn btn-primary">保存配置</button>
+    </section>
+
+    <!-- 图片上传区 -->
+    <section class="upload-section">
+      <h2>🖼️ 图片配置</h2>
+      <div class="upload-grid">
+        <div class="upload-item">
+          <label>背景图片</label>
+          <div class="drop-zone" id="backgroundDrop">
+            <span>拖拽图片到此处或点击上传</span>
+            <img id="backgroundPreview" class="preview" style="display:none">
+          </div>
+          <input type="file" id="backgroundInput" accept="image/*" hidden>
+        </div>
+        <div class="upload-item">
+          <label>头像图片</label>
+          <div class="drop-zone" id="avatarDrop">
+            <span>拖拽图片到此处或点击上传</span>
+            <img id="avatarPreview" class="preview" style="display:none">
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" hidden>
+        </div>
+      </div>
+    </section>
+
+    <!-- Excel 上传区 -->
+    <section class="excel-section">
+      <h2>📊 导入歌曲</h2>
+      <div class="drop-zone" id="excelDrop">
+        <span>拖拽 Excel 文件到此处或点击上传</span>
+        <p class="hint">支持 .xlsx, .xls 格式，第一列歌名，第二列歌手（可选）</p>
+      </div>
+      <input type="file" id="excelInput" accept=".xlsx,.xls" hidden>
+    </section>
+
+    <!-- 歌曲列表区 -->
+    <section class="songs-section">
+      <div class="section-header">
+        <h2>🎶 歌曲管理</h2>
+        <div class="section-actions">
+          <label style="font-size:13px;color:#666;">显示条数：
+            <select id="pendingPageSize" style="padding:4px 8px;border-radius:4px;border:1px solid #ddd;">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div id="songList" class="song-list height-10">
+        <p class="empty-hint">暂无歌曲，请先上传 Excel 导入</p>
+      </div>
+
+      <div class="actions">
+        <button id="searchAllBtn" class="btn btn-secondary" disabled>搜索全部元数据</button>
+      </div>
+    </section>
+
+    <!-- 已保存歌曲区 -->
+    <section class="saved-section">
+      <div class="section-header">
+        <h2>💾 已保存的歌曲</h2>
+        <div class="section-actions">
+          <input type="text" id="savedSearchInput" placeholder="搜索歌名/歌手/专辑/歌词..." style="padding:6px 12px;border-radius:4px;border:1px solid #ddd;width:200px;">
+          <label style="font-size:13px;color:#666;">显示条数：
+            <select id="savedPageSize" style="padding:4px 8px;border-radius:4px;border:1px solid #ddd;">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
+              <option value="30">30</option>
+            </select>
+          </label>
+          <button class="btn btn-success btn-small" onclick="refreshAllSongs()">🔄 更新所有元数据</button>
+          <button class="btn btn-primary btn-small" onclick="openAddSearchModal()">🔍 搜索添加</button>
+          <button class="btn btn-secondary btn-small" onclick="openAddManualModal()">✏️ 手动添加</button>
+        </div>
+      </div>
+      <div id="savedSongs" class="saved-list height-10">
+        <p class="empty-hint">加载中...</p>
+      </div>
+    </section>
+
+    <!-- 生成区 -->
+    <section class="generate-section">
+      <h2>🚀 生成网站</h2>
+      <div class="generate-actions">
+        <button id="generateBtn" class="btn btn-success">生成静态网站</button>
+        <button id="previewBtn" class="btn btn-primary" onclick="window.open('http://localhost:3000', '_blank')">预览网站</button>
+        <span id="generateStatus"></span>
+      </div>
+    </section>
+  </div>
+
+  <!-- 搜索结果弹窗 -->
+  <div id="searchModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>选择歌曲信息</h3>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="searchingText">搜索中...</p>
+        <div id="searchResults" class="search-results"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="searchNeteaseBtn" class="btn btn-secondary" style="display:none;">🔍 同时搜索网易云</button>
+        <button id="manualInputBtn" class="btn btn-secondary">手动输入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手动输入弹窗 -->
+  <div id="manualModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>手动输入歌曲信息</h3>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>歌名 *</label>
+          <input type="text" id="manualTitle">
+        </div>
+        <div class="form-group">
+          <label>歌手</label>
+          <input type="text" id="manualArtist" placeholder="可选">
+        </div>
+        <div class="form-group">
+          <label>专辑</label>
+          <input type="text" id="manualAlbum">
+        </div>
+        <div class="form-group">
+          <label>发布日期</label>
+          <input type="date" id="manualDate">
+        </div>
+        <div class="form-group">
+          <label>语言</label>
+          <select id="manualLanguage">
+            <option value="中文">中文</option>
+            <option value="日语">日语</option>
+            <option value="英语">英语</option>
+            <option value="韩语">韩语</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>歌词</label>
+          <textarea id="manualLyrics" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveManualBtn" class="btn btn-primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "vup-songlist",
+  "version": "1.0.0",
+  "description": "Vup/Vtuber 歌单网站生成器",
+  "scripts": {
+    "admin": "node admin/server.js",
+    "dev": "cd site && npm run dev",
+    "build": "cd site && npm run build",
+    "generate": "node scripts/generate.js"
+  },
+  "keywords": [
+    "vup",
+    "vtuber",
+    "songlist"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "rehype-raw": "^7.0.0",
+    "sharp": "^0.34.5"
+  }
+}
