@@ -51,7 +51,7 @@ npm run admin
    - 点击搜索获取歌曲详情
    - 将元数据保存至本地
 4. **生成网站**：点击"生成静态网站"按钮
-5. **部署**：将 `dist/` 目录部署到任意静态托管服务
+5. **部署**：将 `docs/` 目录部署到任意静态托管服务（如 GitHub Pages）
 
 ### 可用命令
 
@@ -70,7 +70,7 @@ npm run generate   # 从 Resources 生成网站数据并构建
 ├── scripts/        # 构建脚本
 ├── Resources/      # 本地歌曲元数据存储
 ├── public/         # 配置文件和图片
-└── dist/           # 生成的静态网站
+└── docs/           # 生成的静态网站（用于 GitHub Pages）
 ```
 
 ## License

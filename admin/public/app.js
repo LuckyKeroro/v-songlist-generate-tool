@@ -956,7 +956,7 @@ async function generateSite() {
 
     if (data.success) {
       statusEl.textContent = '生成成功！';
-      showToast('网站已生成到 dist/ 目录');
+      showToast('网站已生成到 docs/ 目录');
     } else {
       statusEl.textContent = '生成失败';
     }
