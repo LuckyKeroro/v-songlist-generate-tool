@@ -9,7 +9,7 @@ const RESOURCES_DIR = path.join(ROOT_DIR, 'Resources');
 const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 const SITE_PUBLIC_DIR = path.join(ROOT_DIR, 'site/public');
 const SITE_DATA_DIR = path.join(ROOT_DIR, 'site/src/data');
-const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const DIST_DIR = path.join(ROOT_DIR, 'docs');
 
 async function main() {
   console.log('🚀 开始生成静态网站...\n');
@@ -190,8 +190,8 @@ async function main() {
     // 构建
     execSync('npm run build', { cwd: path.join(ROOT_DIR, 'site'), stdio: 'inherit' });
 
-    // 复制配置、歌曲数据和图片到 dist
-    console.log('\n📦 复制资源到 dist...');
+    // 复制配置、歌曲数据和图片到 docs
+    console.log('\n📦 复制资源到 docs...');
 
     // 复制 config.json
     if (fs.existsSync(path.join(PUBLIC_DIR, 'config.json'))) {
