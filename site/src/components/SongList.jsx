@@ -1,7 +1,7 @@
 import SongItem from './SongItem'
 import './SongList.css'
 
-function SongList({ groupedSongs, onCopy }) {
+function SongList({ groupedSongs, onCopy, sortBy, tableHeader }) {
   if (groupedSongs.length === 0) {
     return (
       <div className="song-list-empty">
@@ -10,24 +10,37 @@ function SongList({ groupedSongs, onCopy }) {
     )
   }
 
-  // 获取所有可用的首字母
-  const availableInitials = groupedSongs.map(g => g.initial)
+  const availableGroups = groupedSongs.map(g => g.initial)
 
-  // 滚动到指定首字母分组
-  const scrollToInitial = (initial) => {
-    const element = document.getElementById(`group-${initial}`)
+  const scrollToGroup = (group) => {
+    const element = document.getElementById(`group-${group}`)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
+  const getGroupLabel = (initial) => {
+    if (sortBy === 'date') {
+      if (initial === '未知') return '未知年份'
+      return `${initial.substring(0, 4)}-${parseInt(initial.substring(0, 4)) + 4}`
+    }
+    return initial
+  }
+
+  const getNavLabel = (initial) => {
+    if (sortBy === 'date') {
+      return initial === '未知' ? '?' : initial.substring(0, 4)
+    }
+    return initial
+  }
+
   return (
     <div className="song-list-container">
-      {/* 歌曲列表 */}
       <div className="song-list">
+        {tableHeader}
         {groupedSongs.map(group => (
           <div key={group.initial} id={`group-${group.initial}`} className="song-group">
-            <div className="group-header">{group.initial}</div>
+            <div className="group-header">{getGroupLabel(group.initial)}</div>
             <div className="group-songs">
               {group.songs.map((song, index) => (
                 <SongItem
@@ -41,15 +54,14 @@ function SongList({ groupedSongs, onCopy }) {
         ))}
       </div>
 
-      {/* 首字母快速定位栏 */}
       <div className="alphabet-bar">
-        {availableInitials.map(initial => (
+        {availableGroups.map(group => (
           <button
-            key={initial}
+            key={group}
             className="alphabet-btn"
-            onClick={() => scrollToInitial(initial)}
+            onClick={() => scrollToGroup(group)}
           >
-            {initial}
+            {getNavLabel(group)}
           </button>
         ))}
       </div>

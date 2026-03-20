@@ -13,34 +13,25 @@ function SongItem({ song, onCopy }) {
     onCopy(song)
   }
 
-  // 格式化发布日期
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
-    try {
-      const date = new Date(dateStr)
-      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
-    } catch {
-      return dateStr
-    }
+    return dateStr.substring(0, 7)
   }
 
   return (
     <div className="song-item-wrapper">
       <div className="song-item" onClick={handleCopy}>
-        <div className="song-info">
-          <span className="song-title">{song.title}</span>
-          <span className="song-artist">{song.artist}</span>
-        </div>
-        <div className="song-meta">
-          <span className="song-album">{song.album}</span>
-          <span className="song-language">{song.language}</span>
-        </div>
+        <span className="song-title" title={song.title}>{song.title}</span>
+        <span className="song-artist" title={song.artist}>{song.artist}</span>
+        <span className="song-album" title={song.album}>{song.album}</span>
+        <span className="song-date">{formatDate(song.releaseDate)}</span>
+        <span className="song-language">{song.language}</span>
         <button
           className={`expand-btn ${expanded ? 'expanded' : ''}`}
           onClick={handleToggle}
           title={expanded ? '收起详情' : '展开详情'}
         >
-          ›
+          <span className={`expand-icon ${expanded ? 'rotated' : ''}`}>⌄</span>
         </button>
       </div>
 
@@ -55,7 +46,7 @@ function SongItem({ song, onCopy }) {
             <div className="album-info">
               <div className="album-name">{song.album || '未知专辑'}</div>
               {song.releaseDate && (
-                <div className="release-date">{formatDate(song.releaseDate)}</div>
+                <div className="release-date">{song.releaseDate}</div>
               )}
             </div>
           </div>

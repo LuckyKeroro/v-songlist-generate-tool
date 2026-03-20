@@ -1,15 +1,6 @@
 import './SearchBar.css'
 
-function SearchBar({ searchTerm, setSearchTerm, languageFilter, setLanguageFilter, languages }) {
-  const languageLabels = {
-    'all': '全部',
-    '中文': '中文',
-    '日语': '日语',
-    '英语': '英语',
-    '韩语': '韩语',
-    '其他': '其他'
-  }
-
+function SearchBar({ searchTerm, setSearchTerm }) {
   return (
     <div className="search-bar">
       <input
@@ -19,17 +10,6 @@ function SearchBar({ searchTerm, setSearchTerm, languageFilter, setLanguageFilte
         onChange={(e) => setSearchTerm(e.target.value)}
         className="search-input"
       />
-      <select
-        value={languageFilter}
-        onChange={(e) => setLanguageFilter(e.target.value)}
-        className="language-select"
-      >
-        {languages.map(lang => (
-          <option key={lang} value={lang}>
-            {languageLabels[lang] || lang}
-          </option>
-        ))}
-      </select>
     </div>
   )
 }

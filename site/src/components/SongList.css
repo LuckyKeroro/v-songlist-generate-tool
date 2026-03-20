@@ -4,14 +4,18 @@
   overflow: hidden;
 }
 
+.song-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
 .alphabet-bar {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 12px 6px;
+  justify-content: space-evenly;
+  padding: 8px 6px;
   background: #f8f9fa;
   border-left: 1px solid #eee;
-  overflow-y: auto;
   flex-shrink: 0;
 }
 
@@ -42,11 +46,6 @@
   color: white;
 }
 
-.song-list {
-  flex: 1;
-  overflow-y: auto;
-}
-
 .song-list-empty {
   background: white;
   border-radius: 12px;
@@ -54,6 +53,7 @@
   text-align: center;
   color: #888;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 16px;
 }
 
 .song-group {
@@ -72,7 +72,7 @@
   color: #2d6a4f;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
 }
 
 .group-songs {
@@ -96,4 +96,17 @@
 
 .song-list::-webkit-scrollbar-thumb:hover {
   background: #aaa;
+}
+
+.alphabet-bar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.alphabet-bar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.alphabet-bar::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
 }

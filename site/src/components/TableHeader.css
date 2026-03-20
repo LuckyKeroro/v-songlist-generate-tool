@@ -1,0 +1,127 @@
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 70px 50px 10px;
+  padding: 10px 16px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.header-cell.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.header-cell.sortable:hover {
+  color: #2d6a4f;
+}
+
+.header-cell.active {
+  color: #2d6a4f;
+}
+
+.sort-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sort-icon {
+  font-size: 12px;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.lang-btn:hover {
+  color: #2d6a4f;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+}
+
+.lang-dropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+  min-width: 80px;
+  overflow: hidden;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lang-option {
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+}
+
+.lang-option:hover {
+  background: #f0f0f0;
+}
+
+.lang-option.selected {
+  background: #e8f5e9;
+  color: #2d6a4f;
+}
+
+/* 中等宽度：隐藏专辑和发布时间列 */
+@media (max-width: 600px) {
+  .table-header {
+    grid-template-columns: 1fr 1fr 50px 10px;
+    padding: 8px 12px;
+  }
+
+  .header-cell:nth-child(3), /* 专辑 */
+  .header-cell:nth-child(4) {
+    display: none;
+  }
+}
+
+/* 更窄时：隐藏整个表头 */
+@media (max-width: 400px) {
+  .table-header {
+    display: none;
+  }
+}
