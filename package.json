@@ -5,7 +5,7 @@
   "scripts": {
     "admin": "node admin/server.js",
     "dev": "cd site && npm run dev",
-    "build": "cd site && npm run build",
+    "build": "cd site && npm install && npm run build",
     "generate": "node scripts/generate.js"
   },
   "keywords": [
