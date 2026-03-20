@@ -7,6 +7,9 @@ import SongList from './components/SongList'
 import Toast from './components/Toast'
 import './App.css'
 
+// 获取基础路径
+const BASE_URL = import.meta.env.BASE_URL || './'
+
 function App() {
   const [config, setConfig] = useState(null)
   const [songsData, setSongsData] = useState([])
@@ -20,8 +23,8 @@ function App() {
   // 加载数据
   useEffect(() => {
     Promise.all([
-      fetch('./config.json').then(r => r.json()),
-      fetch('./songs.json').then(r => r.json())
+      fetch(`${BASE_URL}config.json`).then(r => r.json()),
+      fetch(`${BASE_URL}songs.json`).then(r => r.json())
     ])
       .then(([configData, songs]) => {
         setConfig(configData)
@@ -198,7 +201,7 @@ function App() {
     <div
       className="app"
       style={{
-        backgroundImage: config.background ? `url(./${config.background})` : undefined
+        backgroundImage: config.background ? `url(${BASE_URL}${config.background})` : undefined
       }}
     >
       <div className="glass-container">

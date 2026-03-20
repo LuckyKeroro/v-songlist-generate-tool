@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import './SongItem.css'
 
+const BASE_URL = import.meta.env.BASE_URL || './'
+
 function SongItem({ song, onCopy }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -39,7 +41,7 @@ function SongItem({ song, onCopy }) {
         <div className="song-details">
           <div className="details-left">
             {song.cover ? (
-              <img src={`./${song.cover}`} alt={song.album || '专辑封面'} className="album-cover" />
+              <img src={`${BASE_URL}${song.cover}`} alt={song.album || '专辑封面'} className="album-cover" />
             ) : (
               <div className="album-cover-placeholder">🎵</div>
             )}

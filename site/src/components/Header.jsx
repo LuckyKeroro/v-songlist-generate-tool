@@ -2,13 +2,15 @@ import './Header.css'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
+const BASE_URL = import.meta.env.BASE_URL || './'
+
 function Header({ config }) {
   return (
     <div className="header">
       <div className="header-left">
         <div className="avatar-wrapper">
           <img
-            src={`./${config.avatar || 'avatar.jpg'}`}
+            src={`${BASE_URL}${config.avatar || 'avatar.jpg'}`}
             alt={config.name}
             className="avatar"
           />
