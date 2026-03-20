@@ -1,5 +1,4 @@
 node_modules/
-Resources/
 public/background.*
 public/avatar.*
 !public/.gitkeep
