@@ -57,7 +57,7 @@ async function main() {
     console.log('  config.json 已复制');
   }
 
-  // 3. 复制图片资源（转换非jpg格式为jpg）
+  // 3. 复制图片资源（转换非jpg格式为jpg，并压缩头像和背景图）
   console.log('🖼️ 处理图片资源...');
   const imageFiles = fs.readdirSync(PUBLIC_DIR).filter(f =>
     /\.(jpg|jpeg|png|gif|webp)$/i.test(f)
@@ -66,6 +66,60 @@ async function main() {
   const convertedFiles = [];
   const filesToDelete = [];
 
+  // 压缩目标大小
+  const AVATAR_TARGET = 100 * 1024; // 100KB
+  const BACKGROUND_TARGET = 500 * 1024; // 500KB
+
+  // 压缩图片函数
+  async function compressImage(sharpInstance, targetSize, type) {
+    const metadata = await sharpInstance.metadata();
+    let quality = 90;
+    let buffer;
+    let attempts = 0;
+    const maxAttempts = 15;
+    let minQuality = 10;
+    let maxQuality = 90;
+
+    while (attempts < maxAttempts) {
+      attempts++;
+
+      if (type === 'avatar') {
+        const resizeRatio = Math.min(1, Math.sqrt(targetSize / metadata.width / metadata.height / 3) * 2);
+        const newWidth = Math.round(metadata.width * Math.max(0.3, resizeRatio));
+        buffer = await sharpInstance
+          .clone()
+          .resize(newWidth)
+          .jpeg({ quality, mozjpeg: true })
+          .toBuffer();
+      } else {
+        buffer = await sharpInstance
+          .clone()
+          .jpeg({ quality, mozjpeg: true })
+          .toBuffer();
+      }
+
+      const currentSize = buffer.length;
+      const ratio = currentSize / targetSize;
+
+      if (ratio >= 0.9 && ratio <= 1.1) break;
+
+      if (currentSize > targetSize) {
+        maxQuality = quality;
+        quality = Math.floor((minQuality + quality) / 2);
+      } else {
+        minQuality = quality;
+        quality = Math.floor((quality + maxQuality) / 2);
+      }
+
+      if (quality < 10) {
+        quality = 10;
+        break;
+      }
+    }
+
+    return buffer;
+  }
+
   for (const file of imageFiles) {
     const ext = path.extname(file).toLowerCase();
     const baseName = path.basename(file, ext);
@@ -73,26 +127,53 @@ async function main() {
     const sourcePath = path.join(PUBLIC_DIR, file);
     const targetPath = path.join(SITE_PUBLIC_DIR, targetFile);
 
-    if (ext === '.jpg' || ext === '.jpeg') {
-      // 已经是jpg格式，直接复制
-      fs.copyFileSync(sourcePath, targetPath);
-      console.log(`  ${file} 已复制`);
-      convertedFiles.push(targetFile);
-    } else {
-      // 需要转换格式
-      try {
-        await sharp(sourcePath)
-          .jpeg({ quality: 90 })
-          .toFile(targetPath);
-        console.log(`  ${file} → ${targetFile} (已转换)`);
-        convertedFiles.push(targetFile);
-        filesToDelete.push(file);
-      } catch (error) {
-        console.warn(`  警告: 无法转换 ${file}: ${error.message}`);
-        // 转换失败，直接复制原文件
+    // 判断是否需要压缩
+    const isAvatar = baseName.toLowerCase() === 'avatar';
+    const isBackground = baseName.toLowerCase() === 'background';
+    const needCompress = isAvatar || isBackground;
+
+    try {
+      const sharpInstance = sharp(sourcePath);
+      const originalSize = fs.statSync(sourcePath).size;
+
+      if (needCompress) {
+        const targetSize = isAvatar ? AVATAR_TARGET : BACKGROUND_TARGET;
+        const type = isAvatar ? 'avatar' : 'background';
+
+        if (originalSize <= targetSize) {
+          // 已经足够小，直接复制或转换
+          if (ext === '.jpg' || ext === '.jpeg') {
+            fs.copyFileSync(sourcePath, targetPath);
+            console.log(`  ${file} 已复制 (${(originalSize / 1024).toFixed(0)}KB)`);
+          } else {
+            await sharpInstance.jpeg({ quality: 90 }).toFile(targetPath);
+            console.log(`  ${file} → ${targetFile} (已转换)`);
+            filesToDelete.push(file);
+          }
+        } else {
+          // 需要压缩
+          const buffer = await compressImage(sharpInstance, targetSize, type);
+          fs.writeFileSync(targetPath, buffer);
+          const saved = ((1 - buffer.length / originalSize) * 100).toFixed(0);
+          console.log(`  ${file} ${(originalSize / 1024).toFixed(0)}KB → ${(buffer.length / 1024).toFixed(0)}KB (压缩${saved}%)`);
+          if (ext !== '.jpg' && ext !== '.jpeg') {
+            filesToDelete.push(file);
+          }
+        }
+      } else if (ext === '.jpg' || ext === '.jpeg') {
         fs.copyFileSync(sourcePath, targetPath);
-        convertedFiles.push(file);
+        console.log(`  ${file} 已复制`);
+      } else {
+        await sharpInstance.jpeg({ quality: 90 }).toFile(targetPath);
+        console.log(`  ${file} → ${targetFile} (已转换)`);
+        filesToDelete.push(file);
       }
+
+      convertedFiles.push(targetFile);
+    } catch (error) {
+      console.warn(`  警告: 无法处理 ${file}: ${error.message}`);
+      fs.copyFileSync(sourcePath, targetPath);
+      convertedFiles.push(file);
     }
   }
 
@@ -230,6 +311,64 @@ async function main() {
       if (fs.existsSync(sourcePath)) {
         fs.copyFileSync(sourcePath, path.join(DIST_DIR, file));
         console.log(`  ${file} 已复制`);
+      }
+    }
+
+    // 压缩 docs 目录下的头像和背景图片（确保不超过目标大小）
+    console.log('\n🗜️ 检查图片大小...');
+    const imagesToCheck = [
+      { name: config.avatar, target: AVATAR_TARGET, type: 'avatar' },
+      { name: config.background, target: BACKGROUND_TARGET, type: 'background' }
+    ].filter(img => img.name);
+
+    for (const img of imagesToCheck) {
+      const filePath = path.join(DIST_DIR, img.name);
+      if (!fs.existsSync(filePath)) continue;
+
+      const currentSize = fs.statSync(filePath).size;
+      if (currentSize <= img.target) {
+        console.log(`  ${img.name} ${(currentSize / 1024).toFixed(0)}KB ✓`);
+        continue;
+      }
+
+      // 需要压缩
+      const sharpInstance = sharp(filePath);
+      const metadata = await sharpInstance.metadata();
+      let quality = 90;
+      let buffer;
+      let minQuality = 10;
+      let maxQuality = 90;
+
+      for (let i = 0; i < 15; i++) {
+        if (img.type === 'avatar') {
+          const resizeRatio = Math.min(1, Math.sqrt(img.target / currentSize) * 1.5);
+          const newWidth = Math.round(metadata.width * Math.max(0.3, resizeRatio));
+          buffer = await sharp(filePath).resize(newWidth).jpeg({ quality, mozjpeg: true }).toBuffer();
+        } else {
+          buffer = await sharp(filePath).jpeg({ quality, mozjpeg: true }).toBuffer();
+        }
+
+        const ratio = buffer.length / img.target;
+        if (ratio >= 0.9 && ratio <= 1.1) break;
+
+        if (buffer.length > img.target) {
+          maxQuality = quality;
+          quality = Math.floor((minQuality + quality) / 2);
+        } else {
+          minQuality = quality;
+          quality = Math.floor((quality + maxQuality) / 2);
+        }
+        if (quality < 10) { quality = 10; break; }
+      }
+
+      fs.writeFileSync(filePath, buffer);
+      const saved = ((1 - buffer.length / currentSize) * 100).toFixed(0);
+      console.log(`  ${img.name} ${(currentSize / 1024).toFixed(0)}KB → ${(buffer.length / 1024).toFixed(0)}KB (压缩${saved}%)`);
+
+      // 同步压缩 site/public 中的源文件
+      const sourcePath = path.join(SITE_PUBLIC_DIR, img.name);
+      if (fs.existsSync(sourcePath)) {
+        fs.writeFileSync(sourcePath, buffer);
       }
     }
 
