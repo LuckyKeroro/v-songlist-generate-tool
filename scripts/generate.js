@@ -211,15 +211,15 @@ async function main() {
     console.log('  songs.json 已复制');
 
     // 复制封面图片目录
-    const distCoversDir = path.join(DIST_DIR, 'covers');
-    if (!fs.existsSync(distCoversDir)) {
-      fs.mkdirSync(distCoversDir, { recursive: true });
+    const docsCoversDir = path.join(DIST_DIR, 'covers');
+    if (!fs.existsSync(docsCoversDir)) {
+      fs.mkdirSync(docsCoversDir, { recursive: true });
     }
     const coverFiles = fs.readdirSync(coversDir);
     for (const file of coverFiles) {
       fs.copyFileSync(
         path.join(coversDir, file),
-        path.join(distCoversDir, file)
+        path.join(docsCoversDir, file)
       );
     }
     console.log(`  封面图片已复制 (${coverFiles.length} 个)`);

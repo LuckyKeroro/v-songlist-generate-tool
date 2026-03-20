@@ -816,16 +816,16 @@ app.listen(PORT, () => {
 let previewServer = null;
 
 function startPreviewServer() {
-  const distDir = path.join(ROOT_DIR, 'dist');
+  const docsDir = path.join(ROOT_DIR, 'docs');
 
-  // 检查 dist 目录是否存在
-  if (!fs.existsSync(distDir)) {
-    fs.mkdirSync(distDir, { recursive: true });
+  // 检查 docs 目录是否存在
+  if (!fs.existsSync(docsDir)) {
+    fs.mkdirSync(docsDir, { recursive: true });
   }
 
   // 使用 Python 的简单 HTTP 服务器
   previewServer = spawn('python3', ['-m', 'http.server', String(PREVIEW_PORT)], {
-    cwd: distDir,
+    cwd: docsDir,
     stdio: 'ignore'
   });
 
