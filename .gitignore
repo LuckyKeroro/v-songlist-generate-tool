@@ -9,3 +9,6 @@ public/avatar.*
 # Claude Code 相关
 .claude/
 CLAUDE.md
+
+# 设计文档（不上传）
+specs/
