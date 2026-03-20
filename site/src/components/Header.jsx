@@ -34,7 +34,16 @@ function Header({ config }) {
         </div>
         {config.announcement && (
           <div className="announcement">
-            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{config.announcement}</ReactMarkdown>
+            <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                a: ({ children, href }) => (
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {children}
+                  </a>
+                )
+              }}
+            >{config.announcement}</ReactMarkdown>
           </div>
         )}
       </div>
