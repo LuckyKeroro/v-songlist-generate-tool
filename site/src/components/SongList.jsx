@@ -36,34 +36,38 @@ function SongList({ groupedSongs, onCopy, sortBy, tableHeader }) {
 
   return (
     <div className="song-list-container">
-      <div className="song-list">
+      <div className="song-list-header">
         {tableHeader}
-        {groupedSongs.map(group => (
-          <div key={group.initial} id={`group-${group.initial}`} className="song-group">
-            <div className="group-header">{getGroupLabel(group.initial)}</div>
-            <div className="group-songs">
-              {group.songs.map((song, index) => (
-                <SongItem
-                  key={`${song.title}-${song.artist}-${index}`}
-                  song={song}
-                  onCopy={onCopy}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
+      <div className="song-list-wrapper">
+        <div className="song-list">
+          {groupedSongs.map(group => (
+            <div key={group.initial} id={`group-${group.initial}`} className="song-group">
+              <div className="group-header">{getGroupLabel(group.initial)}</div>
+              <div className="group-songs">
+                {group.songs.map((song, index) => (
+                  <SongItem
+                    key={`${song.title}-${song.artist}-${index}`}
+                    song={song}
+                    onCopy={onCopy}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
 
-      <div className="alphabet-bar">
-        {availableGroups.map(group => (
-          <button
-            key={group}
-            className="alphabet-btn"
-            onClick={() => scrollToGroup(group)}
-          >
-            {getNavLabel(group)}
-          </button>
-        ))}
+        <div className="alphabet-bar">
+          {availableGroups.map(group => (
+            <button
+              key={group}
+              className="alphabet-btn"
+              onClick={() => scrollToGroup(group)}
+            >
+              {getNavLabel(group)}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

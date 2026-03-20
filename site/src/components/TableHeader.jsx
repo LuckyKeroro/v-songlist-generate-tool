@@ -92,7 +92,8 @@ function TableHeader({
             )}
           </div>
         ))}
-        <div className="header-cell"></div>
+        <div className="header-cell spacer-scrollbar"></div>
+        <div className="header-cell spacer-nav"></div>
       </div>
 
       {showLangDropdown && createPortal(

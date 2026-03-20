@@ -1,6 +1,6 @@
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 70px 50px 10px;
+  grid-template-columns: 2fr 1.5fr 1.5fr 70px 50px 15px 36px;
   padding: 10px 16px;
   background: #f8f9fa;
   border-bottom: 2px solid #e0e0e0;
@@ -109,7 +109,7 @@
 /* 中等宽度：隐藏专辑和发布时间列 */
 @media (max-width: 600px) {
   .table-header {
-    grid-template-columns: 1fr 1fr 50px 10px;
+    grid-template-columns: 1fr 1fr 50px 15px 36px;
     padding: 8px 12px;
   }
 

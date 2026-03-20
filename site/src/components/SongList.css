@@ -2,11 +2,22 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  flex-direction: column;
+}
+
+.song-list-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
 .song-list {
   flex: 1;
   overflow-y: auto;
+}
+
+.song-list-header {
+  flex-shrink: 0;
 }
 
 .alphabet-bar {
@@ -78,35 +89,4 @@
 .group-songs {
   display: flex;
   flex-direction: column;
-}
-
-/* 滚动条样式 */
-.song-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.song-list::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-.song-list::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
-
-.song-list::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
-
-.alphabet-bar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.alphabet-bar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.alphabet-bar::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 2px;
 }
