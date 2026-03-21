@@ -2,7 +2,7 @@
   "title": "蛙吹Keroro的不完整歌单",
   "name": "蛙吹Keroro",
   "subtitle": "房间号:22344968",
-  "announcement": "<i class=\"fas fa-music\"></i> <strong>蛙吹Keroro 的不完整歌单</strong> <i class=\"fas fa-sync-alt\"></i> \n\n<i class=\"fas fa-sync-alt\"></i> **歌单持续更新中** ：\n- <i class=\"fas fa-file-alt\"></i> 蛙神发布的歌单表格（更新至[250108](https://docs.qq.com/sheet/DUGFMR253WXJxamxp?tab=000001)）\n- <i class=\"fas fa-headphones\"></i> 直播间听过但表格中没有的歌\n\n<small style=\"display: flex;\"><span style=\"flex-shrink: 0;\"><i class=\"fas fa-code\"></i> </span><span>本网页由<strong>LuckyKe_</strong>自发制作 | 如有问题烦请随时在Q群/B站联系我，请别打扰主播哦~</span></small>\n\n<small>  <i class=\"fab fa-github\"></i> [Github](https://github.com/LuckyKeroro/v-songlist-generate-tool) | 资源均来自网络  </small>",
+  "announcement": "<i class=\"fas fa-music\"></i> <strong>蛙吹Keroro 的不完整歌单</strong> <i class=\"fas fa-sync-alt\"></i> \n\n<i class=\"fas fa-sync-alt\"></i> **歌单持续更新中** ：\n- <i class=\"fas fa-file-alt\"></i> 蛙神发布的歌单表格（更新至[250108](https://docs.qq.com/sheet/DUGFMR253WXJxamxp?tab=000001)）\n- <i class=\"fas fa-headphones\"></i> 直播间听过但表格中没有的歌\n\n<small><i class=\"fas fa-code\"></i> **LuckyKe_** 自发制作 | <i class=\"fab fa-github\"></i>  [Github](https://github.com/LuckyKeroro/v-songlist-generate-tool) | <i class=\"fas fa-envelope\"></i> [联系邮箱](mailto:luckykeroro@126.com) </small>\n\n<small style=\"display: flex;\"><span style=\"flex-shrink: 0; margin-right: 4px;\"><i class=\"fas fa-exclamation-triangle\"></i></span><span>本站为粉丝为方便查歌制作的非盈利开源项目，资料均来自公开网络。如有Bug反馈、歌单错误或侵权删改需求，烦请直接联系作者，请勿打扰主播哦~ </span></small>",
   "links": [
     {
       "text": "个人空间",
@@ -16,7 +16,5 @@
       "text": "直播周表",
       "url": "https://www.bilibili.com/opus/1180314900546715650"
     }
-  ],
-  "background": "background.jpg",
-  "avatar": "avatar.JPG"
+  ]
 }
