@@ -181,6 +181,13 @@ function App() {
     }
   }
 
+  // 随机复制一首歌
+  const handleRandomCopy = () => {
+    if (filteredSongs.length === 0) return
+    const randomSong = filteredSongs[Math.floor(Math.random() * filteredSongs.length)]
+    handleCopy(randomSong)
+  }
+
   if (loading) {
     return (
       <div className="app loading">
@@ -207,7 +214,7 @@ function App() {
       <div className="glass-container">
         <Header config={config} />
         <div className="song-panel">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} onRandomCopy={handleRandomCopy} />
           <SongList
             groupedSongs={groupedSongs}
             onCopy={handleCopy}
