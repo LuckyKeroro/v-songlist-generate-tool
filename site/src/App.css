@@ -53,6 +53,7 @@
   height: calc(100vh - 280px);
   min-height: 400px;
   position: relative;
+  overflow: hidden;
 }
 
 /* 响应式 */

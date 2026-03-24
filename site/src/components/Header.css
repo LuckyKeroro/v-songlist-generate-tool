@@ -110,6 +110,10 @@
   text-decoration: underline;
 }
 
+.announcement a.normal-link {
+  color: inherit;
+}
+
 .announcement strong {
   font-weight: 600;
   color: #333;

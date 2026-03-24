@@ -14,6 +14,8 @@
 .song-list {
   flex: 1;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .song-list-header {
@@ -27,6 +29,7 @@
   padding: 8px 6px;
   background: #f8f9fa;
   border-left: 1px solid #eee;
+  border-radius: 0 0 12px 0;
   flex-shrink: 0;
 }
 
@@ -83,7 +86,7 @@
   color: #2d6a4f;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 1;
 }
 
 .group-songs {
