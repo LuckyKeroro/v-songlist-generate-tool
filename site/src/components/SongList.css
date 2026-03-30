@@ -31,6 +31,8 @@
   border-left: 1px solid #eee;
   border-radius: 0 0 12px 0;
   flex-shrink: 0;
+  min-width: 36px;
+  box-sizing: border-box;
 }
 
 .alphabet-btn {
@@ -60,6 +62,12 @@
   color: white;
 }
 
+.song-list-empty-hint {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+}
+
 .song-list-empty {
   background: white;
   border-radius: 12px;
@@ -78,6 +86,19 @@
   border-bottom: none;
 }
 
+.search-result-bar {
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d6a4f;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .group-header {
   padding: 10px 16px;
   background: #f8f9fa;
@@ -87,6 +108,20 @@
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.relevance-sort {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.relevance-sort:hover,
+.relevance-sort.active {
+  color: #2d6a4f;
 }
 
 .group-songs {

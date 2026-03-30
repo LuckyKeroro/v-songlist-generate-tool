@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { pinyin } from 'pinyin-pro'
 import Header from './components/Header'
 import SearchBar from './components/SearchBar'
 import TableHeader from './components/TableHeader'
 import SongList from './components/SongList'
 import Toast from './components/Toast'
+import { buildSearchIndex, searchSongs } from './utils/fuzzyMatch'
 import './App.css'
 
 // 获取基础路径
@@ -16,9 +17,11 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [languageFilter, setLanguageFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('artist') // 'artist' | 'title' | 'album' | 'date'
-  const [sortOrder, setSortOrder] = useState('asc') // 'asc' | 'desc'
+  const [sortBy, setSortBy] = useState('artist')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [toast, setToast] = useState({ show: false, message: '' })
+  const [searchIndex, setSearchIndex] = useState([])
+  const prevSortRef = useRef(null) // 记住搜索前的排序状态
 
   // 加载数据
   useEffect(() => {
@@ -29,6 +32,7 @@ function App() {
       .then(([configData, songs]) => {
         setConfig(configData)
         setSongsData(songs || [])
+        setSearchIndex(buildSearchIndex(songs || [], pinyin))
         setLoading(false)
         if (configData.title) {
           document.title = configData.title
@@ -71,26 +75,58 @@ function App() {
 
   // 过滤歌曲
   const filteredSongs = useMemo(() => {
-    let result = [...songsData]
+    let source = songsData
+    let index = searchIndex
 
     if (languageFilter !== 'all') {
-      result = result.filter(s => s.language === languageFilter)
+      const filtered = []
+      const filteredIdx = []
+      source.forEach((s, i) => {
+        if (s.language === languageFilter) {
+          filtered.push(s)
+          filteredIdx.push(index[i])
+        }
+      })
+      source = filtered
+      index = filteredIdx
     }
 
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase()
-      result = result.filter(s =>
-        s.title?.toLowerCase().includes(term) ||
-        s.artist?.toLowerCase().includes(term) ||
-        s.lyrics?.toLowerCase().includes(term)
-      )
+      return searchSongs(source, index, searchTerm, pinyin)
     }
 
-    return result
-  }, [searchTerm, languageFilter, songsData])
+    return source
+  }, [searchTerm, languageFilter, songsData, searchIndex])
+
+  const isSearching = searchTerm.trim().length > 0
+
+  // 搜索词变化时自动切换到相关度排序
+  const handleSearchTermChange = (value) => {
+    const wasSearching = searchTerm.trim().length > 0
+    const willSearch = value.trim().length > 0
+
+    if (!wasSearching && willSearch) {
+      prevSortRef.current = { sortBy, sortOrder }
+      setSortBy('relevance')
+      setSortOrder('desc')
+    } else if (wasSearching && !willSearch && prevSortRef.current) {
+      setSortBy(prevSortRef.current.sortBy)
+      setSortOrder(prevSortRef.current.sortOrder)
+      prevSortRef.current = null
+    }
+    setSearchTerm(value)
+  }
 
   // 排序和分组
   const groupedSongs = useMemo(() => {
+    // 相关度排序：扁平列表，不分组
+    if (isSearching && sortBy === 'relevance') {
+      const songs = sortOrder === 'asc' ? [...filteredSongs].reverse() : filteredSongs
+      return songs.length > 0
+        ? [{ initial: '搜索结果', songs }]
+        : []
+    }
+
     let sorted = [...filteredSongs]
 
     const getField = (song, field) => {
@@ -109,14 +145,12 @@ function App() {
       const valB = getField(b, sortBy)
 
       if (sortBy === 'date') {
-        // 日期排序
         if (!valA && !valB) return 0
         if (!valA) return 1
         if (!valB) return -1
         const cmp = valA.localeCompare(valB)
         return sortOrder === 'asc' ? cmp : -cmp
       } else {
-        // 文本排序（按拼音）
         if (!valA && !valB) return 0
         if (!valA) return 1
         if (!valB) return -1
@@ -214,11 +248,15 @@ function App() {
       <div className="glass-container">
         <Header config={config} />
         <div className="song-panel">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} onRandomCopy={handleRandomCopy} />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={handleSearchTermChange} onRandomCopy={handleRandomCopy} />
           <SongList
             groupedSongs={groupedSongs}
             onCopy={handleCopy}
             sortBy={sortBy}
+            sortOrder={sortOrder}
+            setSortBy={setSortBy}
+            setSortOrder={setSortOrder}
+            isSearching={isSearching}
             tableHeader={
               <TableHeader
                 sortBy={sortBy}
@@ -233,6 +271,9 @@ function App() {
           />
         </div>
       </div>
+      {config.copyright && (
+        <div className="copyright">{config.copyright}</div>
+      )}
       {toast.show && <Toast message={toast.message} onClose={() => setToast({ show: false, message: '' })} />}
     </div>
   )

@@ -32,6 +32,10 @@
           <label>公告内容</label>
           <textarea id="announcement" rows="3" placeholder="输入公告内容"></textarea>
         </div>
+        <div class="config-item">
+          <label>底部版权信息</label>
+          <input type="text" id="copyright" placeholder="如：© 2025 XXX All Rights Reserved">
+        </div>
       </div>
 
       <div class="links-config">
@@ -81,6 +85,15 @@
       <div class="section-header">
         <h2>🎶 歌曲管理</h2>
         <div class="section-actions">
+          <label style="font-size:13px;color:#666;">状态筛选：
+            <select id="statusFilter" style="padding:4px 8px;border-radius:4px;border:1px solid #ddd;">
+              <option value="all">全部</option>
+              <option value="pending">待处理</option>
+              <option value="exists">已存在</option>
+              <option value="confirmed">已确认</option>
+              <option value="manual">手动输入</option>
+            </select>
+          </label>
           <label style="font-size:13px;color:#666;">显示条数：
             <select id="pendingPageSize" style="padding:4px 8px;border-radius:4px;border:1px solid #ddd;">
               <option value="5">5</option>

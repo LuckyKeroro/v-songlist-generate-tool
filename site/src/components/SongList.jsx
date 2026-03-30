@@ -1,15 +1,7 @@
 import SongItem from './SongItem'
 import './SongList.css'
 
-function SongList({ groupedSongs, onCopy, sortBy, tableHeader }) {
-  if (groupedSongs.length === 0) {
-    return (
-      <div className="song-list-empty">
-        <p>没有找到匹配的歌曲</p>
-      </div>
-    )
-  }
-
+function SongList({ groupedSongs, onCopy, sortBy, sortOrder, setSortBy, setSortOrder, isSearching, tableHeader }) {
   const availableGroups = groupedSongs.map(g => g.initial)
 
   const scrollToGroup = (group) => {
@@ -38,12 +30,35 @@ function SongList({ groupedSongs, onCopy, sortBy, tableHeader }) {
     <div className="song-list-container">
       <div className="song-list-header">
         {tableHeader}
+        {isSearching && (
+          <div className="search-result-bar">
+            <span>搜索结果</span>
+            <span
+              className={`relevance-sort ${sortBy === 'relevance' ? 'active' : ''}`}
+              onClick={() => {
+                if (sortBy === 'relevance') {
+                  setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+                } else {
+                  setSortBy('relevance')
+                  setSortOrder('desc')
+                }
+              }}
+            >
+              相关度{sortBy === 'relevance' ? (sortOrder === 'asc' ? ' ↑' : ' ↓') : ''}
+            </span>
+          </div>
+        )}
       </div>
       <div className="song-list-wrapper">
         <div className="song-list">
+          {groupedSongs.length === 0 && (
+            <div className="song-list-empty-hint">没有找到匹配的歌曲</div>
+          )}
           {groupedSongs.map(group => (
             <div key={group.initial} id={`group-${group.initial}`} className="song-group">
-              <div className="group-header">{getGroupLabel(group.initial)}</div>
+              {group.initial !== '搜索结果' && (
+                <div className="group-header">{getGroupLabel(group.initial)}</div>
+              )}
               <div className="group-songs">
                 {group.songs.map((song, index) => (
                   <SongItem
@@ -58,15 +73,17 @@ function SongList({ groupedSongs, onCopy, sortBy, tableHeader }) {
         </div>
 
         <div className="alphabet-bar">
-          {availableGroups.map(group => (
-            <button
-              key={group}
-              className="alphabet-btn"
-              onClick={() => scrollToGroup(group)}
-            >
-              {getNavLabel(group)}
-            </button>
-          ))}
+          {availableGroups
+            .filter(group => group !== '搜索结果')
+            .map(group => (
+              <button
+                key={group}
+                className="alphabet-btn"
+                onClick={() => scrollToGroup(group)}
+              >
+                {getNavLabel(group)}
+              </button>
+            ))}
         </div>
       </div>
     </div>

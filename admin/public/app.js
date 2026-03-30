@@ -28,6 +28,7 @@ async function loadConfig() {
     document.getElementById('streamerName').value = config.name || '';
     document.getElementById('subtitle').value = config.subtitle || '';
     document.getElementById('announcement').value = config.announcement || '';
+    document.getElementById('copyright').value = config.copyright || '';
 
     // 加载链接配置
     linksData = config.links || [];
@@ -84,6 +85,7 @@ async function saveConfig() {
     name: document.getElementById('streamerName').value,
     subtitle: document.getElementById('subtitle').value,
     announcement: document.getElementById('announcement').value,
+    copyright: document.getElementById('copyright').value,
     links: linksData.filter(link => link.text || link.url) // 过滤掉空白链接
   };
 
@@ -118,19 +120,21 @@ async function loadSavedSongs() {
 }
 
 function filterSavedSongs() {
-  const searchInput = document.getElementById('savedSearchInput').value.toLowerCase().trim();
-  if (!searchInput) {
+  const rawInput = document.getElementById('savedSearchInput').value.trim();
+  if (!rawInput) {
     renderSavedSongs(savedSongsCache);
     return;
   }
 
+  const searchNorm = normalizeSearch(rawInput);
+
   const filtered = savedSongsCache.filter(song => {
     return (
-      (song.title && song.title.toLowerCase().includes(searchInput)) ||
-      (song.artist && song.artist.toLowerCase().includes(searchInput)) ||
-      (song.album && song.album.toLowerCase().includes(searchInput)) ||
-      (song.lyrics && song.lyrics.toLowerCase().includes(searchInput)) ||
-      (song.language && song.language.toLowerCase().includes(searchInput))
+      normalizeSearch(song.title).includes(searchNorm) ||
+      normalizeSearch(song.artist).includes(searchNorm) ||
+      normalizeSearch(song.album).includes(searchNorm) ||
+      normalizeSearch(song.lyrics).includes(searchNorm) ||
+      normalizeSearch(song.language).includes(searchNorm)
     );
   });
 
@@ -446,18 +450,86 @@ function splitArtists(text) {
     .filter(a => a.length > 0);
 }
 
-// 规范化文本：去除空格、特殊符号，转小写
+// 繁体→简体映射表（歌曲标题常见字）
+const TRAD_TO_SIMP = {
+  '愛':'爱','葉':'叶','語':'语','風':'风','夢':'梦','戀':'恋','傷':'伤',
+  '歲':'岁','時':'时','間':'间','書':'书','長':'长','開':'开','門':'门',
+  '見':'见','問':'问','聽':'听','說':'说','話':'话','請':'请','讓':'让',
+  '東':'东','雲':'云','飛':'飞','鳥':'鸟','魚':'鱼','龍':'龙','鳳':'凤',
+  '華':'华','國':'国','園':'园','場':'场','島':'岛','陽':'阳','陰':'阴',
+  '電':'电','車':'车','機':'机','關':'关','運':'运','動':'动','靜':'静',
+  '紅':'红','藍':'蓝','綠':'绿','銀':'银','經':'经','線':'线','練':'练',
+  '體':'体','頭':'头','臉':'脸','淚':'泪','聲':'声','響':'响',
+  '樂':'乐','調':'调','詞':'词','節':'节','義':'义','禮':'礼',
+  '離':'离','遠':'远','還':'还','過':'过','後':'后','裡':'里','邊':'边',
+  '點':'点','燈':'灯','滿':'满','無':'无','盡':'尽','難':'难','單':'单',
+  '雙':'双','親':'亲','對':'对','從':'从','當':'当','實':'实','與':'与',
+  '為':'为','個':'个','這':'这','們':'们','來':'来','馬':'马',
+  '寶':'宝','貝':'贝','記':'记','設':'设','試':'试','認':'认','識':'识',
+  '應':'应','號':'号','傳':'传','統':'统','總':'总','將':'将',
+  '達':'达','張':'张','許':'许','論':'论','獨':'独',
+  '層':'层','覺':'觉','戰':'战','續':'续','類':'类','絲':'丝','處':'处',
+  '復':'复','創':'创','衛':'卫','環':'环','產':'产',
+  '專':'专','結':'结','殺':'杀','確':'确','碼':'码','領':'领','飄':'飘',
+  '麗':'丽','歡':'欢','買':'买','賣':'卖','學':'学','廣':'广','滅':'灭',
+  '條':'条','養':'养','勝':'胜','敗':'败','藝':'艺','術':'术','塵':'尘',
+  '憶':'忆','靈':'灵','寧':'宁','鑰':'钥','鎖':'锁','錢':'钱','鐵':'铁',
+  '鏡':'镜','濕':'湿','溫':'温','準':'准','災':'灾','壞':'坏','佈':'布',
+  '歷':'历','曆':'历','僅':'仅','優':'优','償':'偿','億':'亿',
+  '煙':'烟','獻':'献','瘋':'疯','療':'疗','癡':'痴','盤':'盘',
+  '碎':'碎','禪':'禅','穩':'稳','競':'竞','純':'纯','納':'纳',
+  '終':'终','緣':'缘','繼':'继','織':'织','翻':'翻','聖':'圣',
+  '腦':'脑','舊':'旧','莊':'庄','萬':'万','藏':'藏','蘭':'兰',
+  '號':'号','螢':'萤','訴':'诉','詩':'诗','誰':'谁','諾':'诺','譜':'谱',
+  '變':'变','貓':'猫','趙':'赵','輕':'轻','輝':'辉','轉':'转',
+  '鄰':'邻','釋':'释','鋼':'钢','錄':'录','閃':'闪','閱':'阅',
+  '陳':'陈','隨':'随','雜':'杂','靜':'静','頻':'频','顏':'颜',
+  '願':'愿','驚':'惊','鬧':'闹','魔':'魔','黑':'黑',
+};
+
+function toSimplified(text) {
+  if (!text) return '';
+  let result = '';
+  for (let i = 0; i < text.length; i++) {
+    result += TRAD_TO_SIMP[text[i]] || text[i];
+  }
+  return result;
+}
+
+// 符号规范化：将相似符号统一，移除标点
+function normalizeSymbols(text) {
+  return text
+    .normalize('NFKC')
+    // 相似符号映射
+    .replace(/[♯＃]/g, '#')
+    .replace(/[꞉∶﹕：]/g, ':')
+    // 移除中文标点
+    .replace(/[。，、；：？！""''（）【】《》…—～·「」『』〈〉﹏]+/g, '')
+    // 移除英文标点（不移除#和:，它们可能有语义）
+    .replace(/[!?;'"`,\.]+/g, '');
+}
+
+// 规范化文本：用于歌曲匹配（去括号、去版本标识、去空格）
 function normalizeText(text) {
   if (!text) return '';
-  return text
-    .toLowerCase()
-    // 去除括号及其内容（如 "(Explicit)", "(Live)", "（ remix ）"）
-    .replace(/[\(\[【\(].*?[\)\]】\)]/gi, '')
-    // 去除常见版本标识
-    .replace(/\b(explicit|clean|radio\s*edit|edit|remix|live|acoustic|instrumental|demo|remaster|version|slowed|reverb|cover|カバー)\b/gi, '')
-    // 去除空格和常见符号
-    .replace(/[\s\-_\.\,\·・]/g, '')
-    .normalize('NFKC'); // 统一 Unicode 字符（如全角转半角）
+  return normalizeSymbols(
+    toSimplified(text.toLowerCase())
+      // 去除括号及其内容（如 "(Explicit)", "(Live)", "（ remix ）"）
+      .replace(/[\(\[【\(].*?[\)\]】\)]/gi, '')
+      // 去除常见版本标识
+      .replace(/\b(explicit|clean|radio\s*edit|edit|remix|live|acoustic|instrumental|demo|remaster|version|slowed|reverb|cover|カバー)\b/gi, '')
+      // 去除空格和常见符号
+      .replace(/[\s\-_\·・]/g, '')
+  );
+}
+
+// 规范化文本：用于搜索场景（不去括号、不去版本标识，保留空格）
+function normalizeSearch(text) {
+  if (!text) return '';
+  return normalizeSymbols(
+    toSimplified(text.toLowerCase())
+      .replace(/[\s]+/g, ' ').trim()
+  );
 }
 
 // 提取括号内的中文译名（排除版本等关键词)
@@ -557,7 +629,17 @@ function renderPendingSongs() {
     return;
   }
 
-  container.innerHTML = pendingSongs.map((song, index) => `
+  const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+  const songsToRender = pendingSongs
+    .map((song, index) => ({ song, index }))
+    .filter(({ song }) => statusFilter === 'all' || song.status === statusFilter);
+
+  if (songsToRender.length === 0) {
+    container.innerHTML = '<p class="empty-hint">没有符合筛选条件的歌曲</p>';
+    return;
+  }
+
+  container.innerHTML = songsToRender.map(({ song, index }) => `
     <div class="song-item ${song.status === 'exists' || song.status === 'confirmed' || song.status === 'manual' ? 'clickable' : ''}"
          ${song.status === 'exists' || song.status === 'confirmed' || song.status === 'manual' ? `onclick="scrollToSavedSong('${escapeHtml(song.title)}', '${escapeHtml(song.artist || '')}')"` : ''}>
       <div class="song-info">
@@ -983,6 +1065,9 @@ function setupEventListeners() {
     const list = document.getElementById('savedSongs');
     list.className = list.className.replace(/height-\d+/, `height-${e.target.value}`);
   });
+
+  // 歌曲状态筛选
+  document.getElementById('statusFilter').addEventListener('change', renderPendingSongs);
 
   // 已保存歌曲搜索
   document.getElementById('savedSearchInput').addEventListener('input', filterSavedSongs);

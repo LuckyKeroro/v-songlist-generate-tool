@@ -5,8 +5,8 @@
   background-position: center;
   background-attachment: fixed;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   padding: 40px 20px;
   box-sizing: border-box;
 }
@@ -42,6 +42,13 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+}
+
+.copyright {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 12px 0 0;
 }
 
 .song-panel {
