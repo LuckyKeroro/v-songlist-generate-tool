@@ -153,22 +153,56 @@ async function searchNetEase(keyword) {
 // QQ音乐搜索
 async function searchQQMusic(keyword) {
   try {
-    const response = await fetchWithTimeout(`https://c.y.qq.com/soso/fcgi-bin/client_search_cp?p=1&n=10&w=${encodeURIComponent(keyword)}&format=json`, {}, 10000);
-    const data = await response.json();
-
-    if (data.code !== 0 || !data.data || !data.data.song || !data.data.song.list) {
+    const body = JSON.stringify({
+      comm: { ct: '19', cv: '1859', uin: '0' },
+      req: {
+        method: 'DoSearchForQQMusicDesktop',
+        module: 'music.search.SearchCgiService',
+        param: {
+          grp: 1,
+          num_per_page: 10,
+          page_num: 1,
+          query: keyword,
+          search_type: 0
+        }
+      }
+    });
+    const response = await fetchWithTimeout('https://u.y.qq.com/cgi-bin/musicu.fcg', {
+      method: 'POST',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body
+    }, 10000);
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('QQ音乐返回非JSON内容 status=%d text=%s', response.status, text.slice(0, 200));
       return [];
     }
 
-    return data.data.song.list.map(song => ({
-      id: song.songmid,
+    const list = data && data.req && data.req.data && data.req.data.body &&
+                 data.req.data.body.song && data.req.data.body.song.list;
+    if (!list) {
+      return [];
+    }
+
+    return list.map(song => ({
+      id: song.mid,
       source: 'qq',
-      title: song.songname,
-      artist: song.singer.map(s => s.name).join('/'),
-      album: song.albumname,
-      cover: `https://y.qq.com/music/photo_new/T002R300x300M000${song.albummid}.jpg`,
-      releaseDate: song.pubtime ? new Date(song.pubtime * 1000).toISOString().split('T')[0] : null,
-      sourceUrl: `https://y.qq.com/n/ryqq/songDetail/${song.songmid}`
+      title: song.name,
+      artist: (song.singer || []).map(s => s.name).join('/'),
+      album: song.album ? song.album.name : '',
+      cover: song.album && song.album.pmid
+        ? `https://y.qq.com/music/photo_new/T002R300x300M000${song.album.pmid}.jpg`
+        : '',
+      releaseDate: song.time_public || null,
+      sourceUrl: `https://y.qq.com/n/ryqq/songDetail/${song.mid}`
     }));
   } catch (error) {
     console.error('QQ音乐搜索错误:', error.message);

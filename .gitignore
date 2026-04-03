@@ -11,3 +11,6 @@ CLAUDE.md
 
 # 设计文档（不上传）
 specs/
+
+# B站歌单抓取工具（独立功能，不上传）
+get_list_from_bilibili/
