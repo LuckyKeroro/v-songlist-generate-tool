@@ -309,11 +309,39 @@ async function downloadCoverImage(coverUrl, artist, album, title) {
   }
 }
 
+// 按 sourceUrl 查找已有歌曲（用于去重）
+function findSongsBySourceUrl(sourceUrl) {
+  if (!sourceUrl || !fs.existsSync(RESOURCES_DIR)) return [];
+  const matches = [];
+  const artists = fs.readdirSync(RESOURCES_DIR);
+  for (const artist of artists) {
+    const artistDir = path.join(RESOURCES_DIR, artist);
+    if (!fs.statSync(artistDir).isDirectory()) continue;
+    const albums = fs.readdirSync(artistDir);
+    for (const album of albums) {
+      const albumDir = path.join(artistDir, album);
+      if (!fs.statSync(albumDir).isDirectory()) continue;
+      const files = fs.readdirSync(albumDir);
+      for (const file of files) {
+        if (!file.endsWith('.json')) continue;
+        const filePath = path.join(albumDir, file);
+        try {
+          const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+          if (data.sourceUrl && data.sourceUrl === sourceUrl) {
+            matches.push({ filePath, artist, album, title: file.replace(/\.json$/, ''), data });
+          }
+        } catch (e) {}
+      }
+    }
+  }
+  return matches;
+}
+
 // ========== 保存歌曲元数据 ==========
 
 app.post('/api/save-song', async (req, res) => {
   try {
-    const { song } = req.body;
+    const { song, force } = req.body;
     if (!song || !song.title) {
       return res.status(400).json({ error: '缺少必要信息' });
     }
@@ -323,9 +351,38 @@ app.post('/api/save-song', async (req, res) => {
     const title = song.title.replace(/[\/\\:*?"<>|]/g, '_');
 
     const dir = path.join(RESOURCES_DIR, artist, album);
-    fs.mkdirSync(dir, { recursive: true });
-
     const filePath = path.join(dir, `${title}.json`);
+
+    // 通过 sourceUrl 检查是否已存在同源歌曲（避免重复保存）
+    if (song.sourceUrl) {
+      const existing = findSongsBySourceUrl(song.sourceUrl).filter(m => m.filePath !== filePath);
+      if (existing.length > 0 && !force) {
+        return res.status(409).json({
+          error: 'duplicate',
+          message: '已存在同源歌曲',
+          existing: existing.map(m => ({
+            title: m.data.title,
+            artist: m.data.artist,
+            album: m.data.album,
+            filePath: path.relative(RESOURCES_DIR, m.filePath)
+          }))
+        });
+      }
+      // force=true: 删除其它路径下的同源旧文件及其同名封面
+      if (force) {
+        for (const m of existing) {
+          try {
+            fs.unlinkSync(m.filePath);
+            const jpgPath = m.filePath.replace(/\.json$/, '.jpg');
+            if (fs.existsSync(jpgPath)) fs.unlinkSync(jpgPath);
+          } catch (e) {
+            console.warn('删除旧同源文件失败:', m.filePath, e.message);
+          }
+        }
+      }
+    }
+
+    fs.mkdirSync(dir, { recursive: true });
 
     // 判断语言
     const language = song.language || detectLanguage(song.title, song.lyrics);

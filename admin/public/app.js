@@ -844,7 +844,23 @@ async function selectSearchResult(source, idx) {
         body: JSON.stringify({ song: songData })
       });
     }
-    const data = await res.json();
+    let data = await res.json();
+
+    // 处理同源歌曲重复 (409)
+    if (res.status === 409 && data.error === 'duplicate') {
+      const existInfo = (data.existing || []).map(e => `「${e.title}」(${e.artist}/${e.album})`).join('、');
+      const ok = confirm(`歌单中已存在同源歌曲：${existInfo}\n是否用本次结果覆盖？（旧文件将被删除）`);
+      if (!ok) {
+        showToast('已取消');
+        return;
+      }
+      res = await fetch(`${API}/api/save-song`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ song: songData, force: true })
+      });
+      data = await res.json();
+    }
 
     if (data.success) {
       if (!reSearchMode && currentSongIndex >= 0) {
@@ -975,7 +991,7 @@ async function autoSearchSong(index) {
       } catch (e) {}
 
       // 保存
-      await fetch(`${API}/api/save-song`, {
+      const saveRes = await fetch(`${API}/api/save-song`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -991,7 +1007,12 @@ async function autoSearchSong(index) {
         })
       });
 
-      pendingSongs[index].status = 'confirmed';
+      // 批量流程不自动覆盖：同源歌曲已存在则跳过
+      if (saveRes.status === 409) {
+        pendingSongs[index].status = 'exists';
+      } else {
+        pendingSongs[index].status = 'confirmed';
+      }
     }
   } catch (error) {
     console.error(`处理歌曲 "${song.title}" 失败:`, error);
