@@ -195,7 +195,7 @@ async function searchQQMusic(keyword) {
     return list.map(song => ({
       id: song.mid,
       source: 'qq',
-      title: song.name,
+      title: song.title || song.name,
       artist: (song.singer || []).map(s => s.name).join('/'),
       album: song.album ? song.album.name : '',
       cover: song.album && song.album.pmid
