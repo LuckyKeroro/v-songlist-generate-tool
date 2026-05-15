@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const xlsx = require('xlsx');
 const { spawn } = require('child_process');
+const { resolveArtistAlias } = require('./aliases');
 
 const app = express();
 const PORT = 3001;
@@ -346,7 +347,9 @@ app.post('/api/save-song', async (req, res) => {
       return res.status(400).json({ error: '缺少必要信息' });
     }
 
-    const artist = (song.artist || '未知歌手').replace(/[\/\\:*?"<>|]/g, '_');
+    const resolvedArtist = resolveArtistAlias(song.artist || '未知歌手');
+    song.artist = resolvedArtist; // 保证后续 sourceUrl 去重、cover 下载、JSON 写入都用标准名
+    const artist = resolvedArtist.replace(/[\/\\:*?"<>|]/g, '_');
     const album = (song.album || '未知专辑').replace(/[\/\\:*?"<>|]/g, '_');
     const title = song.title.replace(/[\/\\:*?"<>|]/g, '_');
 
@@ -567,7 +570,9 @@ app.put('/api/song/:artist/:album/:title', async (req, res) => {
     }
 
     // 创建新文件（可能在不同目录）
-    const newArtist = toSafeName(song.artist || '未知歌手');
+    const resolvedArtist = resolveArtistAlias(song.artist || '未知歌手');
+    song.artist = resolvedArtist;
+    const newArtist = toSafeName(resolvedArtist);
     const newAlbum = toSafeName(song.album || '未知专辑');
     const newTitle = toSafeName(song.title);
 
