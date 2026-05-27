@@ -2,6 +2,27 @@ node_modules/
 public/background.*
 public/avatar.*
 !public/.gitkeep
+
+# ── 个人歌单数据：源文件不随仓库分发 ──
+# 他人 clone 后用 admin 工具 (npm run admin) 从零建自己的歌单；
+# npm run generate 会据此重建 docs/。⚠️ 你自己的数据请务必另存备份！
+/Resources/*
+!/Resources/.gitkeep
+
+# ── 个人站点配置：复制 config.example.json → config.json 后自填 ──
+/public/config.json
+
+# ── site/ 下由 npm run generate 重建的派生产物（不跟踪，构建时自动生成）──
+/site/public/config.json
+/site/public/songs.json
+/site/public/covers/
+/site/public/background.*
+/site/public/avatar.*
+/site/src/data/songs.json
+
+# ── 个人自定义域名源副本：不分发，避免他人 fork 后误把域名指向你 ──
+# （线上站靠的是 docs/CNAME，那个保持跟踪，不受影响）
+/site/public/CNAME
 .DS_Store
 *.log
 

@@ -1,0 +1,17 @@
+{
+  "title": "你的歌单标题",
+  "name": "主播名称",
+  "subtitle": "副标题（例如：房间号:12345）",
+  "announcement": "<i class=\"fas fa-music\"></i> <strong>这里是公告</strong>\n\n支持 Markdown 与 HTML、Font Awesome 图标。复制本文件为 config.json 后自行修改。",
+  "copyright": "© 2026 你的名字",
+  "links": [
+    {
+      "text": "个人空间",
+      "url": "https://space.bilibili.com/你的ID"
+    },
+    {
+      "text": "直播间",
+      "url": "https://live.bilibili.com/你的房间号"
+    }
+  ]
+}
