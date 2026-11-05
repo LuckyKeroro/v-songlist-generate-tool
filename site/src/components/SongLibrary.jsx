@@ -28,22 +28,7 @@ function getInitial(text) {
 }
 
 function SongRow({ song, onSelect, onCopy, onSearch, onFilterYear, onFilterLanguage }) {
-  const [copyState, setCopyState] = useState('idle')
-
-  useEffect(() => {
-    if (copyState === 'idle') return
-    const timer = window.setTimeout(() => setCopyState('idle'), 500)
-    return () => window.clearTimeout(timer)
-  }, [copyState])
-
-  const handleCopy = () => {
-    const nextState = onCopy(song) ? 'copied' : 'manual'
-    if (copyState === 'idle') setCopyState(nextState)
-    else {
-      setCopyState('idle')
-      window.requestAnimationFrame(() => setCopyState(nextState))
-    }
-  }
+  const handleCopy = () => onCopy(song)
   const copyFromBlank = event => {
     if (event.target !== event.currentTarget) return
     if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return
@@ -54,7 +39,7 @@ function SongRow({ song, onSelect, onCopy, onSearch, onFilterYear, onFilterLangu
 
   return (
     <div
-      className={`song-row ${copyState}`}
+      className="song-row"
       onClick={copyFromBlank}
       onKeyDown={copyFromBlank}
       tabIndex={0}
