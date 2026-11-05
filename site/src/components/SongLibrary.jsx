@@ -27,20 +27,28 @@ function getInitial(text) {
   return '#'
 }
 
-function SongRow({ song, onSelect, onCopy, onSearch }) {
+function SongRow({ song, onSelect, onCopy, onSearch, onFilterYear, onFilterLanguage }) {
   const [copyState, setCopyState] = useState('idle')
 
   useEffect(() => {
     if (copyState === 'idle') return
-    const timer = window.setTimeout(() => setCopyState('idle'), 900)
+    const timer = window.setTimeout(() => setCopyState('idle'), 500)
     return () => window.clearTimeout(timer)
   }, [copyState])
 
+  const handleCopy = () => {
+    const nextState = onCopy(song) ? 'copied' : 'manual'
+    if (copyState === 'idle') setCopyState(nextState)
+    else {
+      setCopyState('idle')
+      window.requestAnimationFrame(() => setCopyState(nextState))
+    }
+  }
   const copyFromBlank = event => {
     if (event.target !== event.currentTarget) return
     if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return
     if (event.type === 'keydown') event.preventDefault()
-    setCopyState(onCopy(song) ? 'copied' : 'manual')
+    handleCopy()
   }
   const showDetail = () => onSelect(song)
 
@@ -56,13 +64,13 @@ function SongRow({ song, onSelect, onCopy, onSearch }) {
       <button className="song-cover detail-cell" onClick={showDetail} aria-label={`查看 ${song.title} 的详情`}>
         {song.cover ? <img src={assetUrl(song.cover)} alt="" loading="lazy" /> : <Icon name="music" size={20} />}
       </button>
-      <button className="song-title-button detail-cell" onClick={showDetail} title={song.title}>
+      <button className="song-title-button" onClick={handleCopy} title={song.title} aria-label={`复制点歌 ${song.title}`}>
         <strong>{song.title}</strong>
       </button>
       <button className="song-artist meta-cell" onClick={() => onSearch(song.artist)} title={`搜索歌手：${song.artist}`}>{song.artist || '未知歌手'}</button>
       <button className="song-album meta-cell" onClick={() => onSearch(song.album)} title={`搜索专辑：${song.album}`}>{song.album || '未知专辑'}</button>
-      <button className="song-date meta-cell" onClick={() => onSearch(song.releaseDate?.slice(0, 4))} title={`搜索发行年份：${song.releaseDate?.slice(0, 4) || '未知'}`}>{song.releaseDate ? song.releaseDate.slice(0, 4) : '—'}</button>
-      <button className="song-language meta-cell" onClick={() => onSearch(song.language)} title={`搜索语言：${song.language || '其他'}`}>
+      <button className="song-date meta-cell" onClick={() => onFilterYear(song.releaseDate?.slice(0, 4))} title={`筛选发行年份：${song.releaseDate?.slice(0, 4) || '未知'}`}>{song.releaseDate ? song.releaseDate.slice(0, 4) : '—'}</button>
+      <button className="song-language meta-cell" onClick={() => onFilterLanguage(song.language)} title={`筛选语言：${song.language || '其他'}`}>
         <span className="language-tag">{song.language || '其他'}</span>
       </button>
     </div>
@@ -79,6 +87,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
   const listRef = useRef(null)
   const groupRefs = useRef({})
   const previousSortRef = useRef(null)
+  const pendingGroupRef = useRef(null)
   const searchIndex = useMemo(() => buildSearchIndex(songs, pinyin), [songs])
 
   const languages = useMemo(() => {
@@ -144,7 +153,13 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
 
   useEffect(() => {
     setActiveGroup(groups[0]?.key || '')
-    groupRefs.current = {}
+  }, [groups])
+
+  useEffect(() => {
+    const target = pendingGroupRef.current
+    if (!target || !groups.some(group => group.key === target)) return
+    pendingGroupRef.current = null
+    window.requestAnimationFrame(() => scrollToGroup(target))
   }, [groups])
 
   const handleQueryChange = value => {
@@ -200,6 +215,26 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
     if (listRef.current) listRef.current.scrollTop = 0
   }
 
+  const filterByYear = year => {
+    if (!year) return
+    if (sortBy === 'date' && !query.trim() && language === 'all') {
+      scrollToGroup(year)
+      return
+    }
+    handleQueryChange('')
+    setLanguage('all')
+    setSortBy('date')
+    setSortOrder('asc')
+    pendingGroupRef.current = year
+  }
+
+  const filterByLanguage = value => {
+    if (!value) return
+    handleQueryChange('')
+    setLanguage(value)
+    if (listRef.current) listRef.current.scrollTop = 0
+  }
+
   const randomSong = () => {
     if (!filteredSongs.length) return
     const song = filteredSongs[Math.floor(Math.random() * filteredSongs.length)]
@@ -223,7 +258,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
       </div>
       <div className="usage-guide">
         <Icon name="info" size={15} />
-        <span>点击封面/歌名查看详情；点击空白处复制点歌文本；点击歌手/专辑/年份/语言筛选搜索。</span>
+        <span>点击封面查看歌曲卡片；点击歌名/空白处复制点歌；点击歌手/专辑/年份/语言筛选。</span>
       </div>
 
       <div className="library-card">
@@ -285,7 +320,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
                     </header>
                   )}
                   {group.songs.map((song, index) => (
-                    <SongRow key={`${song.sourceUrl || song.title}-${song.artist}-${index}`} song={song} onSelect={onSelect} onCopy={onCopy} onSearch={searchFor} />
+                    <SongRow key={`${song.sourceUrl || song.title}-${song.artist}-${index}`} song={song} onSelect={onSelect} onCopy={onCopy} onSearch={searchFor} onFilterYear={filterByYear} onFilterLanguage={filterByLanguage} />
                   ))}
                 </section>
               ))}

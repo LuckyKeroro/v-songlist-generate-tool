@@ -561,3 +561,13 @@ button:disabled, button:disabled * { cursor: url('/cursors/normal.png') 3 3, aut
 }
 
 .song-row { transition: background-color .35s ease, box-shadow .35s ease; }
+
+.song-row { transition: background-color .2s cubic-bezier(.4,0,.2,1), box-shadow .2s ease; }
+.song-row.copied { animation: copy-flash .5s cubic-bezier(.4,0,.2,1); }
+.song-row .song-title-button, .song-row .song-title-button * { cursor: url('/cursors/copy.png') 3 3, copy !important; }
+.song-title-button:hover strong { color: #33493b; }
+@keyframes copy-flash {
+  0% { background-color: rgba(221,247,122,0); }
+  35% { background-color: var(--lime-soft); }
+  100% { background-color: rgba(221,247,122,0); }
+}
