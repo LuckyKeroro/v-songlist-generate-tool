@@ -5,9 +5,11 @@ import Icon from './Icon'
 export default function AddToHome() {
   const [installEvent, setInstallEvent] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
-  const isAppleSafari = /Macintosh|iPhone|iPad|iPod/.test(navigator.platform)
-    && /Safari/.test(navigator.userAgent)
-    && !/Chrome|Chromium|CriOS|Edg|OPR/.test(navigator.userAgent)
+  const needsAppleMenuHelp = /iPhone|iPad|iPod/.test(navigator.platform)
+    || /CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent)
+    || (/Macintosh/.test(navigator.platform)
+      && /Safari/.test(navigator.userAgent)
+      && !/Chrome|Chromium|CriOS|Edg|OPR|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent))
 
   useEffect(() => {
     const capturePrompt = event => {
@@ -28,7 +30,7 @@ export default function AddToHome() {
   }, [showHelp])
 
   const handleClick = async () => {
-    if (isAppleSafari) {
+    if (needsAppleMenuHelp) {
       setShowHelp(true)
       return
     }
@@ -66,7 +68,7 @@ export default function AddToHome() {
             <button className="icon-button home-help-close" onClick={() => setShowHelp(false)} aria-label="关闭提示" autoFocus><Icon name="close" size={18} /></button>
             <span className="home-help-icon"><Icon name="home" size={24} /></span>
             <h2 id="home-help-title">添加到主屏幕</h2>
-            <p>{isAppleSafari ? '请点击浏览器中的“…”按钮，再选择“分享”，然后点击“添加到主屏幕”。' : '请打开浏览器菜单或分享菜单，选择“添加到主屏幕”或“安装应用”。'}</p>
+            <p>{needsAppleMenuHelp ? '请点击浏览器中的“…”按钮，再选择“分享”，然后点击“添加到主屏幕”。' : '请打开浏览器菜单或分享菜单，选择“添加到主屏幕”或“安装应用”。'}</p>
             <button className="button button-primary" onClick={() => setShowHelp(false)}>知道了</button>
           </section>
         </div>,
