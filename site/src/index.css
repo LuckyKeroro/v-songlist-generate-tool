@@ -511,3 +511,9 @@ button:disabled { cursor: url('/cursors/normal.png') 3 3, auto; }
   .hero-buttons .button { min-width: 0; width: 100%; padding: 0 clamp(4px, 1.5vw, 12px); gap: clamp(3px, 1vw, 7px); font-size: clamp(10px, 3vw, 12px); white-space: nowrap; }
   .hero-buttons .button svg { flex-shrink: 0; width: clamp(13px, 4vw, 18px); height: clamp(13px, 4vw, 18px); }
 }
+
+.column-labels { top: 8px; margin: 8px 0 0; border: 1px solid #dce4d5; border-radius: 10px; box-shadow: 0 3px 10px rgba(43,65,45,.035); }
+.group-header { top: 60px; }
+@media (max-width: 700px) {
+  .column-labels { border-radius: 8px; }
+}
