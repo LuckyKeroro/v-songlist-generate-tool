@@ -1,19 +1,33 @@
 import Icon from './Icon'
+import AddToHome from './AddToHome'
 import { assetUrl } from '../utils/assets'
 
 export default function Hero({ config, songs }) {
   const artists = new Set(songs.map(song => song.artist).filter(Boolean)).size
   const languages = new Set(songs.map(song => song.language).filter(Boolean)).size
   const roomId = config.subtitle?.match(/\d+/)?.[0] || '22344968'
+  const sourceText = '蛙神发布的歌单表格'
+  const announcement = config.announcement || ''
+  const sourceIndex = announcement.indexOf(sourceText)
 
   return (
     <section className="hero" id="top">
       <div className="hero-copy">
         <p className="section-kicker">KERORO'S SONG ARCHIVE</p>
         <h1>{config.name} 的<br />不完整歌单</h1>
-        <p className="hero-intro">{config.announcement}</p>
+        <p className="hero-intro">
+          {sourceIndex >= 0 && config.sourceTableUrl ? (
+            <>
+              {announcement.slice(0, sourceIndex)}
+              <a className="inline-source-link" href={config.sourceTableUrl} target="_blank" rel="noreferrer">
+                {sourceText}<Icon name="external" size={12} />
+              </a>
+              {announcement.slice(sourceIndex + sourceText.length)}
+            </>
+          ) : announcement}
+        </p>
         <div className="hero-info-links">
-          {config.sourceTableUrl && <a href={config.sourceTableUrl} target="_blank" rel="noreferrer">原始歌单表格 <Icon name="external" size={14} /></a>}
+          <AddToHome />
           <a href="https://github.com/LuckyKeroro/v-songlist-generate-tool" target="_blank" rel="noreferrer"><Icon name="github" size={16} /> Github</a>
           <a href="mailto:luckykeroro@126.com"><Icon name="mail" size={16} /> 联系维护者</a>
         </div>
