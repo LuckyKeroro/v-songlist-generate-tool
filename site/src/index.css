@@ -481,3 +481,26 @@ button:disabled { cursor: url('/cursors/normal.png') 3 3, auto; }
 .scrollable-shell { position: relative; }
 .scrollable-area { scrollbar-width: none; -ms-overflow-style: none; }
 .scrollable-area::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.profile-label-narrow { display: none; }
+
+@media (max-width: 700px) {
+  .site-header { gap: 8px; }
+  .header-actions { gap: 6px; }
+  .schedule-nav, .live-nav { flex-shrink: 0; height: 38px; padding: 0 clamp(9px, 2.8vw, 12px); font-size: clamp(9px, 2.8vw, 11px); white-space: nowrap; }
+  .profile-label-wide { display: none; }
+  .profile-label-narrow { display: inline; }
+}
+
+@media (max-width: 700px) {
+  .hero-stats { justify-content: space-between; }
+  .hero-stats > div { min-width: 0; justify-content: center; gap: 4px; padding: 0 clamp(8px, 3vw, 18px); white-space: nowrap; word-break: keep-all; }
+  .hero-stats strong { flex-shrink: 0; font-size: clamp(19px, 5.5vw, 24px); }
+  .hero-stats span { flex-shrink: 0; font-size: clamp(9px, 2.7vw, 11px); white-space: nowrap; }
+}
+
+.search-toolbar, .search-box { min-width: 0; }
+@media (max-width: 700px) {
+  .search-box { flex: 1 1 0; }
+  .random-button { flex-shrink: 0; }
+}

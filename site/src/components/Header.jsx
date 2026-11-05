@@ -18,7 +18,8 @@ export default function Header({ config }) {
       <div className="header-actions">
         {profile && (
           <a className="schedule-nav" href={profile.url} target="_blank" rel="noreferrer">
-            <span>小蛙主页</span>
+            <span className="profile-label-wide">小蛙主页</span>
+            <span className="profile-label-narrow">蛙神主页</span>
             <Icon name="external" size={15} />
           </a>
         )}

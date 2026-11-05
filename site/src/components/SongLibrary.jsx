@@ -253,7 +253,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
                   aria-label={`按${column.label}排序${sortBy === column.field ? sortOrder === 'asc' ? '，当前升序' : '，当前降序' : ''}`}
                 >
                   <span>{column.label}</span>
-                  <span className="sort-indicator">{sortBy === column.field ? sortOrder === 'asc' ? '↑' : '↓' : '↕'}</span>
+                  <span className="sort-indicator">{sortBy === column.field ? sortOrder === 'asc' ? '↑︎' : '↓︎' : '↕︎'}</span>
                 </button>
               ))}
               <LanguageFilter value={language} options={languages} onChange={setLanguage} />
