@@ -29,6 +29,13 @@ function getInitial(text) {
 
 function SongRow({ song, onSelect, onCopy, onSearch }) {
   const [copyState, setCopyState] = useState('idle')
+
+  useEffect(() => {
+    if (copyState === 'idle') return
+    const timer = window.setTimeout(() => setCopyState('idle'), 900)
+    return () => window.clearTimeout(timer)
+  }, [copyState])
+
   const copyFromBlank = event => {
     if (event.target !== event.currentTarget) return
     if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return

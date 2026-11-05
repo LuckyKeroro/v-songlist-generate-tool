@@ -559,3 +559,5 @@ button:disabled, button:disabled * { cursor: url('/cursors/normal.png') 3 3, aut
 @media (max-width: 400px) {
   .alphabet-rail { display: none; }
 }
+
+.song-row { transition: background-color .35s ease, box-shadow .35s ease; }
