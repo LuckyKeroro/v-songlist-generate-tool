@@ -1,0 +1,28 @@
+{
+  "title": "主播名字的不完整歌单",
+  "name": "主播名字",
+  "subtitle": "Bilibili 直播间 12345678",
+  "announcement": "在这里写一段简短的歌单介绍。",
+  "sourceTableUrl": "https://docs.qq.com/",
+  "copyright": "© 2026 主播名字 & 维护者",
+  "links": [
+    {
+      "text": "个人空间",
+      "url": "https://space.bilibili.com/12345678"
+    },
+    {
+      "text": "直播间",
+      "url": "https://live.bilibili.com/12345678"
+    },
+    {
+      "text": "直播周表",
+      "url": "https://space.bilibili.com/12345678/dynamic"
+    }
+  ],
+  "background": "background.jpg",
+  "avatar": "avatar.JPG",
+  "schedule": {
+    "mid": "12345678",
+    "fallbackUrl": "https://space.bilibili.com/12345678/dynamic"
+  }
+}

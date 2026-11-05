@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f7ef">
+  <title>不完整歌单 · 内容管理</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="admin-topbar">
+    <a class="admin-brand" href="/">
+      <span class="admin-logo">K</span>
+      <span><strong>KERORO</strong><small>CONTENT STUDIO</small></span>
+    </a>
+    <div class="topbar-actions">
+      <span class="local-badge"><i></i> 本地管理模式</span>
+      <button class="btn btn-secondary btn-small" onclick="window.open('http://localhost:3000', '_blank')">预览网站 ↗</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="workspace-heading">
+      <div><p>SONG ARCHIVE WORKSPACE</p><h1>歌曲收藏夹，<br>慢慢整理也很好。</h1></div>
+      <span class="workspace-note">所有修改仅保存在当前电脑的<br><code>Resources/</code> 与 <code>public/</code> 中</span>
+    </div>
+
+    <section class="config-section">
+      <div class="section-title"><span>01</span><div><h2>站点信息</h2><p>修改首屏名称、公告与外部链接</p></div></div>
+      <div class="config-grid">
+        <div class="config-item"><label for="pageTitle">网页标题</label><input type="text" id="pageTitle" placeholder="输入网页标题"></div>
+        <div class="config-item"><label for="streamerName">主播名字</label><input type="text" id="streamerName" placeholder="输入主播名字"></div>
+        <div class="config-item"><label for="subtitle">副标题 / 房间号</label><input type="text" id="subtitle" placeholder="例如：Bilibili 直播间 22344968"></div>
+        <div class="config-item"><label for="copyright">底部版权信息</label><input type="text" id="copyright" placeholder="© 2026"></div>
+        <div class="config-item config-wide"><label for="announcement">关于歌单</label><textarea id="announcement" rows="3" placeholder="输入一段简洁的歌单介绍"></textarea></div>
+      </div>
+      <div class="links-config">
+        <h3>导航链接</h3>
+        <div id="linksContainer"></div>
+        <button type="button" class="btn btn-text btn-small" onclick="addLink()">＋ 添加链接</button>
+      </div>
+      <div class="section-bottom"><button id="saveConfig" class="btn btn-primary">保存站点信息</button></div>
+    </section>
+
+    <section class="upload-section">
+      <div class="section-title"><span>02</span><div><h2>视觉素材</h2><p>上传后会在下次生成网站时自动压缩</p></div></div>
+      <div class="upload-grid">
+        <div class="upload-item">
+          <label>首屏插画</label>
+          <div class="drop-zone" id="backgroundDrop"><span>拖拽图片到这里，或点击上传<small>建议横向插画 · JPG / PNG / WebP</small></span><img id="backgroundPreview" class="preview" style="display:none" alt="首屏插画预览"></div>
+          <input type="file" id="backgroundInput" accept="image/*" hidden>
+        </div>
+        <div class="upload-item">
+          <label>主播头像</label>
+          <div class="drop-zone avatar-drop" id="avatarDrop"><span>拖拽头像到这里，或点击上传<small>正方形图片效果最佳</small></span><img id="avatarPreview" class="preview" style="display:none" alt="主播头像预览"></div>
+          <input type="file" id="avatarInput" accept="image/*" hidden>
+        </div>
+      </div>
+    </section>
+
+    <section class="excel-section">
+      <div class="section-title"><span>03</span><div><h2>批量导入</h2><p>从 Excel 快速建立待处理歌曲队列</p></div></div>
+      <div class="drop-zone excel-drop" id="excelDrop"><span><strong>选择或拖入 Excel 文件</strong><small>第一列歌名，第二列歌手（可选） · 支持 .xlsx / .xls</small></span><b>＋</b></div>
+      <input type="file" id="excelInput" accept=".xlsx,.xls" hidden>
+    </section>
+
+    <section class="songs-section">
+      <div class="section-header">
+        <div class="section-title compact"><span>04</span><div><h2>导入队列</h2><p>逐首确认，或自动获取第一项搜索结果</p></div></div>
+        <div class="section-actions">
+          <label class="select-label">状态 <select id="statusFilter"><option value="all">全部</option><option value="pending">待处理</option><option value="exists">已存在</option><option value="confirmed">已确认</option><option value="manual">手动输入</option></select></label>
+          <label class="select-label">行数 <select id="pendingPageSize"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option></select></label>
+        </div>
+      </div>
+      <div id="songList" class="song-list height-10"><p class="empty-hint">暂无待处理歌曲，请先上传 Excel 导入</p></div>
+      <div class="actions"><button id="searchAllBtn" class="btn btn-secondary" disabled>搜索全部元数据</button></div>
+    </section>
+
+    <section class="saved-section">
+      <div class="section-header">
+        <div class="section-title compact"><span>05</span><div><h2>歌曲资料库</h2><p>编辑、更新或重新匹配已收录的歌曲</p></div></div>
+        <div class="section-actions saved-actions-top">
+          <input type="search" id="savedSearchInput" placeholder="搜索已保存歌曲…">
+          <label class="select-label">行数 <select id="savedPageSize"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option></select></label>
+        </div>
+      </div>
+      <div class="library-actions">
+        <button class="btn btn-primary btn-small" onclick="openAddSearchModal()">＋ 搜索添加</button>
+        <button class="btn btn-secondary btn-small" onclick="openAddManualModal()">手动添加</button>
+        <button class="btn btn-text btn-small" onclick="refreshAllSongs()">刷新所有元数据</button>
+      </div>
+      <div id="savedSongs" class="saved-list height-10"><p class="empty-hint">正在读取歌曲…</p></div>
+    </section>
+
+    <section class="generate-section">
+      <div><p>READY TO PUBLISH</p><h2>整理好了，就生成新版网站。</h2><span>生成结果输出到 <code>dist/</code>，推送后由 GitHub Actions 自动部署。</span></div>
+      <div class="generate-actions"><button id="generateBtn" class="btn btn-lime">生成静态网站</button><span id="generateStatus" role="status"></span></div>
+    </section>
+  </main>
+
+  <div id="searchModal" class="modal">
+    <div class="modal-content search-modal-content">
+      <div class="modal-header"><div><p>SONG METADATA</p><h3>搜索并选择歌曲信息</h3></div><button class="close-btn" aria-label="关闭">×</button></div>
+      <div class="modal-body">
+        <div class="modal-search-form"><input id="globalSearchInput" type="search" placeholder="输入歌名或歌手"><button id="globalSearchBtn" class="btn btn-primary btn-small">搜索 QQ 音乐</button></div>
+        <p id="searchingText" style="display:none">正在搜索歌曲信息…</p>
+        <div id="searchResults" class="search-results"><p class="empty-hint">搜索结果会显示在这里</p></div>
+      </div>
+      <div class="modal-footer"><button id="searchNeteaseBtn" class="btn btn-secondary" style="display:none;">同时搜索网易云</button><button id="manualInputBtn" class="btn btn-text">找不到？手动输入</button></div>
+    </div>
+  </div>
+
+  <div id="manualModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header"><div><p>MANUAL ENTRY</p><h3>编辑歌曲信息</h3></div><button class="close-btn" aria-label="关闭">×</button></div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group"><label for="manualTitle">歌名 *</label><input type="text" id="manualTitle"></div>
+          <div class="form-group"><label for="manualArtist">歌手</label><input type="text" id="manualArtist" placeholder="可选"></div>
+          <div class="form-group"><label for="manualAlbum">专辑</label><input type="text" id="manualAlbum"></div>
+          <div class="form-group"><label for="manualDate">发布日期</label><input type="text" id="manualDate" placeholder="YYYY-MM-DD 或 YYYY-MM"></div>
+          <div class="form-group"><label for="manualLanguage">语言</label><select id="manualLanguage"><option value="中文">中文</option><option value="日语">日语</option><option value="英语">英语</option><option value="韩语">韩语</option><option value="其他">其他</option></select></div>
+          <div class="form-group form-wide"><label for="manualLyrics">歌词</label><textarea id="manualLyrics" rows="7"></textarea></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button id="saveManualBtn" class="btn btn-primary">保存歌曲</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

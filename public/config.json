@@ -1,0 +1,38 @@
+{
+  "title": "蛙吹Keroro·不完整歌单",
+  "name": "蛙吹 Keroro",
+  "subtitle": "Bilibili 直播间 22344968",
+  "announcement": "歌单持续更新中。这里收录蛙神发布的歌单表格，也补充直播间里听过但表格中还没有的歌。",
+  "sourceTableUrl": "https://docs.qq.com/sheet/DUGFMR253WXJxamxp?tab=000001",
+  "copyright": "© 2026 蛙吹 Keroro & LuckyKeroro",
+  "links": [
+    {
+      "text": "个人空间",
+      "url": "https://space.bilibili.com/613345189"
+    },
+    {
+      "text": "直播间",
+      "url": "https://live.bilibili.com/22344968"
+    },
+    {
+      "text": "直播周表",
+      "url": "https://www.bilibili.com/opus/1266451126794846216"
+    }
+  ],
+  "background": "background.jpg",
+  "avatar": "avatar.JPG",
+  "schedule": {
+    "mid": "613345189",
+    "fallbackUrl": "https://www.bilibili.com/opus/1266451126794846216",
+    "url": "https://www.bilibili.com/opus/1266451126794846216",
+    "opusId": "1266451126794846216",
+    "title": "11.2-11. 8的周表来了！请查收[蛙吹表情包_应援]",
+    "cover": "https://i0.hdslb.com/bfs/new_dyn/727586716a999e3c60ba5f10d92a272f613345189.png",
+    "updatedAt": "2026-11-03T11:57:11.000Z",
+    "publishedAt": "2026-11-03T11:57:11.000Z",
+    "weekStart": "2026-11-02",
+    "weekEnd": "2026-11-08",
+    "weekLabel": "2026.11.02 – 11.08",
+    "image": "schedule.webp"
+  }
+}

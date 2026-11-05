@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# 构建时生成的站点数据与图片
+site/public/config.json
+site/public/songs.json
+site/public/videos.json
+site/public/covers/
+site/public/avatar.jpg
+site/public/background.jpg
+site/public/schedule.webp
+
+# 本地设置与协作约定
+/AGENTS.md
+.claude/
+.vscode/
+.idea/

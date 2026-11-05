@@ -1,0 +1,27 @@
+{
+  "name": "keroro-songlist",
+  "version": "2.0.0",
+  "private": true,
+  "description": "蛙吹 Keroro 的不完整歌单与本地管理工具",
+  "workspaces": [
+    "site",
+    "admin"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace site -- --host 127.0.0.1",
+    "admin": "node admin/server.js",
+    "build": "node scripts/generate.js",
+    "preview": "npm run preview --workspace site -- --host 127.0.0.1",
+    "update:schedule": "node scripts/update-schedule.js",
+    "test": "node --test admin/*.test.js scripts/*.test.js"
+  },
+  "keywords": [
+    "vup",
+    "vtuber",
+    "songlist"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "sharp": "^0.35.5"
+  }
+}
