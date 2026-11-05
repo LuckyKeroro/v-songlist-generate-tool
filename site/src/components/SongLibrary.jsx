@@ -168,7 +168,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
     if (!element || !container) return
     setActiveGroup(key)
     container.scrollTo({
-      top: container.scrollTop + element.getBoundingClientRect().top - container.getBoundingClientRect().top - 56,
+      top: container.scrollTop + element.getBoundingClientRect().top - container.getBoundingClientRect().top - 8,
       behavior: 'smooth',
     })
   }
@@ -176,7 +176,7 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
   const updateActiveGroup = () => {
     const container = listRef.current
     if (!container || !groups.length) return
-    const threshold = container.getBoundingClientRect().top + 112
+    const threshold = container.getBoundingClientRect().top + 65
     let current = groups[0].key
     for (const group of groups) {
       const element = groupRefs.current[group.key]
@@ -241,8 +241,8 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
           </button>
         </div>
 
-        <div className="library-body">
-          <ScrollableArea className="song-scroll" shellClassName="song-scroll-shell" scrollRef={listRef} onScroll={updateActiveGroup}>
+        <div className={`table-frame ${!query && groups.length > 1 ? 'has-rail' : ''}`}>
+          <div className="column-header-wrap">
             <div className="column-labels">
               <span className="column-cover" aria-hidden="true" />
               {sortableColumns.map(column => (
@@ -258,44 +258,49 @@ export default function SongLibrary({ songs, onSelect, onCopy, onNotify }) {
               ))}
               <LanguageFilter value={language} options={languages} onChange={setLanguage} />
             </div>
-            {groups.length === 0 && (
-              <div className="empty-state">
-                <span><Icon name="search" size={30} /></span>
-                <h3>没有找到匹配的歌曲</h3>
-                <p>试试歌名的一部分、歌手名字，或者拼音首字母。</p>
-                <button onClick={resetFilters}>清空搜索与筛选</button>
-              </div>
-            )}
-            {groups.map(group => (
-              <section className="song-group" key={group.key} ref={element => { groupRefs.current[group.key] = element }}>
-                {!query && (
-                  <header className="group-header">
-                    <strong>{group.key}</strong>
-                    <span>{group.songs.length} 首</span>
-                  </header>
-                )}
-                {group.songs.map((song, index) => (
-                  <SongRow key={`${song.sourceUrl || song.title}-${song.artist}-${index}`} song={song} onSelect={onSelect} onCopy={onCopy} onSearch={searchFor} />
-                ))}
-              </section>
-            ))}
-          </ScrollableArea>
-          {!query && groups.length > 1 && (
-            <nav className="alphabet-rail" aria-label="歌曲分组导航">
+          </div>
+          <div className="library-body">
+            <ScrollableArea className="song-scroll" shellClassName="song-scroll-shell" scrollRef={listRef} onScroll={updateActiveGroup}>
+              {groups.length === 0 && (
+                <div className="empty-state">
+                  <span><Icon name="search" size={30} /></span>
+                  <h3>没有找到匹配的歌曲</h3>
+                  <p>试试歌名的一部分、歌手名字，或者拼音首字母。</p>
+                  <button onClick={resetFilters}>清空搜索与筛选</button>
+                </div>
+              )}
               {groups.map(group => (
-                <button
-                  key={group.key}
-                  className={activeGroup === group.key ? 'active' : ''}
-                  onClick={() => scrollToGroup(group.key)}
-                  aria-current={activeGroup === group.key ? 'true' : undefined}
-                  aria-label={`${group.key}，${group.songs.length} 首`}
-                >
-                  <span>{group.key === '未知年份' ? '?' : group.key}</span>
-                  {activeGroup === group.key && <small>{group.songs.length}</small>}
-                </button>
+                <section className="song-group" key={group.key} ref={element => { groupRefs.current[group.key] = element }}>
+                  {!query && (
+                    <header className="group-header">
+                      <strong>{group.key}</strong>
+                      <span>{group.songs.length} 首</span>
+                    </header>
+                  )}
+                  {group.songs.map((song, index) => (
+                    <SongRow key={`${song.sourceUrl || song.title}-${song.artist}-${index}`} song={song} onSelect={onSelect} onCopy={onCopy} onSearch={searchFor} />
+                  ))}
+                </section>
               ))}
-            </nav>
-          )}
+            </ScrollableArea>
+            {!query && groups.length > 1 && (
+              <nav className="alphabet-rail" aria-label="歌曲分组导航">
+                {groups.map(group => (
+                  <button
+                    key={group.key}
+                    className={activeGroup === group.key ? 'active' : ''}
+                    onClick={() => scrollToGroup(group.key)}
+                    aria-current={activeGroup === group.key ? 'true' : undefined}
+                    aria-label={`${group.key}，${group.songs.length} 首`}
+                    title={`${group.key}，${group.songs.length} 首`}
+                  >
+                    <span>{sortBy === 'date' && /^\d{4}$/.test(group.key) ? group.key.slice(2) : group.key === '未知年份' ? '?' : group.key}</span>
+                    {activeGroup === group.key && <small>{group.songs.length}</small>}
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
         </div>
       </div>
     </section>
