@@ -15,7 +15,7 @@ export default function WeeklySchedule({ schedule }) {
       </div>
       <div className="schedule-frame">
         {image ? (
-          <img src={assetUrl(image)} alt={`蛙吹 Keroro ${schedule.weekLabel || ''} 直播周表`} loading="lazy" />
+          <img src={assetUrl(image)} alt={`蛙吹 Keroro ${schedule.weekLabel || ''} 直播周表`} />
         ) : (
           <p className="schedule-empty">暂时没有可展示的周表图片。</p>
         )}
