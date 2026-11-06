@@ -10,6 +10,8 @@ import BackToTop from './components/BackToTop'
 import FrogMark from './components/FrogMark'
 
 const BASE_URL = import.meta.env.BASE_URL || './'
+const SONGS_VERSION = import.meta.env.VITE_SONGS_VERSION
+const SONGS_URL = `${BASE_URL}songs.json${SONGS_VERSION ? `?v=${SONGS_VERSION}` : ''}`
 
 export default function App() {
   const [config, setConfig] = useState(null)
@@ -25,7 +27,7 @@ export default function App() {
         if (!response.ok) throw new Error('站点配置加载失败')
         return response.json()
       }),
-      fetch(`${BASE_URL}songs.json`).then(response => {
+      fetch(SONGS_URL).then(response => {
         if (!response.ok) throw new Error('歌曲数据加载失败')
         return response.json()
       }),

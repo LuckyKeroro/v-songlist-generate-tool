@@ -40,15 +40,21 @@ function readSongs() {
   })
 }
 
+function versionedAsset(filePath, urlPath) {
+  const version = crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex').slice(0, 12)
+  return `${urlPath}?v=${version}`
+}
+
 async function processSiteImage(filename, outputName, width, quality) {
   const source = path.join(PUBLIC_DIR, filename)
   if (!fs.existsSync(source)) return null
+  const destination = path.join(SITE_PUBLIC_DIR, outputName)
   await sharp(source)
     .rotate()
     .resize({ width, withoutEnlargement: true })
     .jpeg({ quality, mozjpeg: true })
-    .toFile(path.join(SITE_PUBLIC_DIR, outputName))
-  return outputName
+    .toFile(destination)
+  return versionedAsset(destination, outputName)
 }
 
 async function processCover(song) {
@@ -69,7 +75,7 @@ async function processCover(song) {
       .webp({ quality: 82 })
       .toFile(destination)
   }
-  return { ...song, cover: `covers/${outputName}` }
+  return { ...song, cover: versionedAsset(destination, `covers/${outputName}`) }
 }
 
 async function mapConcurrent(items, limit, mapper) {
@@ -83,6 +89,23 @@ async function mapConcurrent(items, limit, mapper) {
   }
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
   return results
+}
+
+function writeCacheManifest(songsVersion) {
+  const distDir = path.join(ROOT_DIR, 'dist')
+  const html = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
+  const assets = [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g)].map(match => match[1])
+  const config = JSON.parse(fs.readFileSync(path.join(distDir, 'config.json'), 'utf8'))
+  const images = [config.background, config.schedule?.image]
+    .filter(value => value && !/^https?:/.test(value))
+    .map(value => `./${value.replace(/^(?:\.\/|\/)/, '')}`)
+  const manifest = {
+    version: '',
+    shell: ['./', './index.html', './config.json', './videos.json', './favicon.svg', './favicon.png', './apple-touch-icon.png', './site.webmanifest'],
+    static: [...new Set([...assets, `./songs.json?v=${songsVersion}`, ...images])],
+  }
+  manifest.version = crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex').slice(0, 12)
+  fs.writeFileSync(path.join(distDir, 'sw-manifest.js'), `self.__KERORO_CACHE__ = ${JSON.stringify(manifest)}\n`)
 }
 
 async function main() {
@@ -100,20 +123,31 @@ async function main() {
   config.avatar = await processSiteImage(config.avatar || 'avatar.JPG', 'avatar.jpg', 800, 88)
   config.background = await processSiteImage(config.background || 'background.jpg', 'background.jpg', 2200, 84)
   const processedSongs = await mapConcurrent(songs, 8, processCover)
+  const songsJson = JSON.stringify(processedSongs)
+  const songsVersion = crypto.createHash('sha256').update(songsJson).digest('hex').slice(0, 12)
+
+  const scheduleImage = path.join(PUBLIC_DIR, 'schedule.webp')
+  if (fs.existsSync(scheduleImage)) {
+    const destination = path.join(SITE_PUBLIC_DIR, 'schedule.webp')
+    fs.copyFileSync(scheduleImage, destination)
+    if (config.schedule?.image && !/^https?:/.test(config.schedule.image)) {
+      config.schedule.image = versionedAsset(destination, config.schedule.image)
+    }
+  }
 
   fs.writeFileSync(path.join(SITE_PUBLIC_DIR, 'config.json'), JSON.stringify(config, null, 2))
-  fs.writeFileSync(path.join(SITE_PUBLIC_DIR, 'songs.json'), JSON.stringify(processedSongs))
+  fs.writeFileSync(path.join(SITE_PUBLIC_DIR, 'songs.json'), songsJson)
   const videosPath = path.join(PUBLIC_DIR, 'videos.json')
   const videos = fs.existsSync(videosPath) ? JSON.parse(fs.readFileSync(videosPath, 'utf8')) : []
   fs.writeFileSync(path.join(SITE_PUBLIC_DIR, 'videos.json'), JSON.stringify(videos))
-  const scheduleImage = path.join(PUBLIC_DIR, 'schedule.webp')
-  if (fs.existsSync(scheduleImage)) fs.copyFileSync(scheduleImage, path.join(SITE_PUBLIC_DIR, 'schedule.webp'))
 
   console.log('构建静态网站…')
   execFileSync('npm', ['run', 'build', '--workspace', 'site'], {
     cwd: ROOT_DIR,
     stdio: 'inherit',
+    env: { ...process.env, VITE_SONGS_VERSION: songsVersion },
   })
+  writeCacheManifest(songsVersion)
   console.log(`构建完成：dist/（${processedSongs.length} 首歌曲）`)
 }
 
