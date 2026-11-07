@@ -55,18 +55,21 @@ npm test                 # Node.js 单元测试
 
 ## 周表图片与视频自动更新
 
-`scripts/update-schedule.js` 调用两个 Bilibili 公开接口：
+`scripts/update-schedule.js` 调用以下 Bilibili 公开接口：
 
 ```text
-https://api.bilibili.com/x/polymer/web-dynamic/desktop/v1/feed/space
-https://api.bilibili.com/x/space/arc/search
+https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/feed/space
+https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail
+https://api.bilibili.com/x/frontend/finger/spi
+https://api.bilibili.com/x/web-interface/nav
+https://api.bilibili.com/x/space/wbi/arc/search
 ```
 
-脚本从 `public/config.json` 读取 `schedule.mid`（当前为 `613345189`），按发布时间选择最近一条文字内容包含“周表”的动态，不使用置顶状态作为判断条件。根据动态发布时间的北京时间计算其所在周（周一至周日），下载封面为 `public/schedule.webp`，并在歌曲目录和最近投稿之间直接展示图片与日期范围，不跳转到动态页面。
+脚本从 `public/config.json` 读取 `schedule.mid`（当前为 `613345189`），选择空间图文列表中最近一条文字内容包含“周表”的动态，不使用置顶状态作为判断条件。通过图文详情获取发布时间，按北京时间计算其所在周（周一至周日），下载封面为 `public/schedule.webp`，并在歌曲目录和最近投稿之间直接展示图片与日期范围，不跳转到动态页面。
 
-同时获取最新四条投稿，写入 `public/videos.json`，在首页纵向展示封面、标题、日期、时长与播放量。周表的 `publishedAt`、`weekStart`、`weekEnd`、`weekLabel` 和本地图片路径保存在 `public/config.json`。
+图文详情使用 `finger/spi` 生成的匿名 `buvid3` 读取公开内容；视频接口使用 `nav` 返回的公开口令生成 WBI 签名。两者都不需要账号 Cookie 或私有凭据。脚本获取最新四条投稿并写入 `public/videos.json`，在首页纵向展示封面、标题、日期、时长与播放量。周表的 `publishedAt`、`weekStart`、`weekEnd`、`weekLabel` 和本地图片路径保存在 `public/config.json`。
 
-两个接口都使用带时间戳参数的六次缓慢重试，间隔逐次增加。没有周表、周表仍是同一条、动态更旧、接口报错或封面下载失败时，不覆盖当前周表配置或图片；视频失败时同样保留旧列表。Actions 只把最新结果带入部署产物，不会每天向仓库提交一次配置变更；本地需要同步时手动运行 `npm run update:schedule`。
+周表与视频更新都使用六次缓慢重试，间隔逐次增加。没有周表、周表仍是同一条、动态更旧、接口报错、详情缺少时间或封面下载失败时，不覆盖当前周表配置或图片；视频接口报错或返回空列表时同样保留旧列表。Actions 只把最新结果带入部署产物，不会每天向仓库提交一次配置变更；本地需要同步时手动运行 `npm run update:schedule`。
 
 ## 本地缓存与更新
 
